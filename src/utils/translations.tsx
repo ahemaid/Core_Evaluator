@@ -627,19 +627,64 @@ export const translations: {
     ar: 'ليس لديك حساب؟'
   },
   'login.demoCredentials': {
-    en: 'Demo Credentials:',
-    de: 'Demo-Zugangsdaten:',
-    ar: 'بيانات الدخول التجريبية:'
+    en: 'Customer Credentials:',
+    de: 'Kunden-Zugangsdaten:',
+    ar: 'بيانات العميل:'
   },
   'login.demoEmail': {
-    en: 'Email: demo@example.com',
-    de: 'E-Mail: demo@example.com',
-    ar: 'البريد الإلكتروني: demo@example.com'
+    en: 'Email: customer@example.com',
+    de: 'E-Mail: customer@example.com',
+    ar: 'البريد الإلكتروني: customer@example.com'
   },
   'login.demoPassword': {
     en: 'Password: password123',
     de: 'Passwort: password123',
     ar: 'كلمة المرور: password123'
+  },
+  'login.selectCustomerRole': {
+    en: 'Select "Customer" role',
+    de: 'Wählen Sie die Rolle "Kunde"',
+    ar: 'اختر دور "العميل"'
+  },
+  'login.demoProviderCredentials': {
+    en: 'Provider Credentials:',
+    de: 'Anbieter-Zugangsdaten:',
+    ar: 'بيانات مقدم الخدمة:'
+  },
+  'login.demoProviderEmail': {
+    en: 'Email: provider@example.com',
+    de: 'E-Mail: provider@example.com',
+    ar: 'البريد الإلكتروني: provider@example.com'
+  },
+  'login.demoProviderPassword': {
+    en: 'Password: password123',
+    de: 'Passwort: password123',
+    ar: 'كلمة المرور: password123'
+  },
+  'login.selectProviderRole': {
+    en: 'Select "Service Provider" role',
+    de: 'Wählen Sie die Rolle "Dienstleister"',
+    ar: 'اختر دور "مقدم الخدمة"'
+  },
+  'login.demoAdminCredentials': {
+    en: 'Admin Credentials:',
+    de: 'Admin-Zugangsdaten:',
+    ar: 'بيانات المشرف:'
+  },
+  'login.demoAdminEmail': {
+    en: 'Email: admin@example.com',
+    de: 'E-Mail: admin@example.com',
+    ar: 'البريد الإلكتروني: admin@example.com'
+  },
+  'login.demoAdminPassword': {
+    en: 'Password: password123',
+    de: 'Passwort: password123',
+    ar: 'كلمة المرور: password123'
+  },
+  'login.selectAdminRole': {
+    en: 'Select "Administrator" role',
+    de: 'Wählen Sie die Rolle "Administrator"',
+    ar: 'اختر دور "المشرف"'
   },
 
   // Provider Dashboard

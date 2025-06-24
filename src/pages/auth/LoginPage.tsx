@@ -167,6 +167,19 @@ const LoginPage: React.FC = () => {
           <p className="font-medium mb-2">{t('login.demoCredentials')}</p>
           <p>{t('login.demoEmail')}</p>
           <p>{t('login.demoPassword')}</p>
+          <p className="text-blue-600 mt-1">{t('login.selectCustomerRole')}</p>
+          <div className="mt-4">
+            <p className="font-medium mb-2">{t('login.demoProviderCredentials')}</p>
+            <p>{t('login.demoProviderEmail')}</p>
+            <p>{t('login.demoProviderPassword')}</p>
+            <p className="text-blue-600 mt-1">{t('login.selectProviderRole')}</p>
+          </div>
+          <div className="mt-4">
+            <p className="font-medium mb-2">{t('login.demoAdminCredentials')}</p>
+            <p>{t('login.demoAdminEmail')}</p>
+            <p>{t('login.demoAdminPassword')}</p>
+            <p className="text-blue-600 mt-1">{t('login.selectAdminRole')}</p>
+          </div>
         </div>
       </div>
     </div>

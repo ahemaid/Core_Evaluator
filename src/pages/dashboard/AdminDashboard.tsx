@@ -3,6 +3,14 @@ import { useTranslation } from '../../utils/translations';
 import { User } from '../../types';
 import { User as UserIcon, Award, AlertTriangle, CheckCircle, XCircle, Star, ClipboardList, Plus, Trash2 } from 'lucide-react';
 import { blogs as initialBlogs, BlogPost } from '../../data/blogs';
+import { mockProviders } from '../../data/mockData';
+import { ServiceProvider } from '../../types';
+import Dialog from '@mui/material/Dialog';
+import DialogTitle from '@mui/material/DialogTitle';
+import DialogContent from '@mui/material/DialogContent';
+import DialogActions from '@mui/material/DialogActions';
+import Button from '@mui/material/Button';
+import { useAuth } from '../../context/AuthContext';
 
 // Mock data
 const mockUsers = [
@@ -20,6 +28,19 @@ const mockEvaluatorRequests = [
   { id: 'e2', doctor: 'Dr. Amr Fathy', date: '2024-07-02', status: 'closed' },
 ];
 
+// Simulate email notification
+function sendEmailNotification(to: string, subject: string, message: string) {
+  // In real app, call backend/email service
+  console.log(`EMAIL TO: ${to}\nSUBJECT: ${subject}\nMESSAGE: ${message}`);
+}
+
+// Audit log utility
+function addAuditLog({ adminId, providerId, action, reason }: { adminId: string; providerId: string; action: string; reason?: string }) {
+  const logs = JSON.parse(localStorage.getItem('auditLogs') || '[]');
+  logs.unshift({ timestamp: new Date().toISOString(), adminId, providerId, action, reason });
+  localStorage.setItem('auditLogs', JSON.stringify(logs));
+}
+
 const AdminDashboard: React.FC = () => {
   const { t, language } = useTranslation();
   const [activeTab, setActiveTab] = useState('overview');
@@ -30,6 +51,15 @@ const AdminDashboard: React.FC = () => {
     author: '',
     image: '',
   });
+  const [pendingProviders, setPendingProviders] = useState<ServiceProvider[]>(() => {
+    const stored = localStorage.getItem('providers');
+    let providers: ServiceProvider[] = mockProviders;
+    if (stored) providers = JSON.parse(stored);
+    return providers.filter(p => p.isApproved === 'pending');
+  });
+  const [selectedProvider, setSelectedProvider] = useState<ServiceProvider | null>(null);
+  const [detailsOpen, setDetailsOpen] = useState(false);
+  const { user: adminUser } = useAuth();
 
   // Count totals
   const totalUsers = mockUsers.length;
@@ -55,6 +85,43 @@ const AdminDashboard: React.FC = () => {
 
   const handleDeleteBlog = (id: string) => {
     setBlogs(blogs.filter(blog => blog.id !== id));
+  };
+
+  const approveProvider = (id: string) => {
+    const stored = localStorage.getItem('providers');
+    let providers: ServiceProvider[] = mockProviders;
+    if (stored) providers = JSON.parse(stored);
+    providers = providers.map(p => p.id === id ? { ...p, isApproved: true } : p);
+    localStorage.setItem('providers', JSON.stringify(providers));
+    setPendingProviders(providers.filter(p => p.isApproved === 'pending'));
+    // Email notification
+    const provider = providers.find(p => p.id === id);
+    if (provider) sendEmailNotification(provider.email, 'Your application has been approved', 'Congratulations! Your provider application has been approved.');
+    // Audit log
+    addAuditLog({ adminId: adminUser?.id || 'admin', providerId: id, action: 'approved' });
+  };
+
+  const rejectProvider = (id: string) => {
+    const stored = localStorage.getItem('providers');
+    let providers: ServiceProvider[] = mockProviders;
+    if (stored) providers = JSON.parse(stored);
+    providers = providers.filter(p => p.id !== id);
+    localStorage.setItem('providers', JSON.stringify(providers));
+    setPendingProviders(providers.filter(p => p.isApproved === 'pending'));
+    // Email notification
+    const provider = providers.find(p => p.id === id);
+    if (provider) sendEmailNotification(provider.email, 'Your application was rejected', 'We regret to inform you that your provider application was rejected.');
+    // Audit log
+    addAuditLog({ adminId: adminUser?.id || 'admin', providerId: id, action: 'rejected' });
+  };
+
+  const openDetails = (provider: ServiceProvider) => {
+    setSelectedProvider(provider);
+    setDetailsOpen(true);
+  };
+  const closeDetails = () => {
+    setDetailsOpen(false);
+    setSelectedProvider(null);
   };
 
   return (
@@ -106,6 +173,13 @@ const AdminDashboard: React.FC = () => {
               <Star className="h-5 w-5" />
               <span>{t('admin.blogManagement') || 'إدارة المدونة'}</span>
             </button>
+            <button
+              onClick={() => setActiveTab('auditLogs')}
+              className={`flex items-center space-x-1 sm:space-x-2 py-2 sm:py-4 border-b-2 transition-colors text-sm sm:text-base ${activeTab === 'auditLogs' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-600 hover:text-gray-900'}`}
+            >
+              <ClipboardList className="h-5 w-5" />
+              <span>Audit Logs</span>
+            </button>
           </nav>
 
           <div className="p-2 sm:p-6">
@@ -130,6 +204,36 @@ const AdminDashboard: React.FC = () => {
             {/* Doctor/User Management Tab */}
             {activeTab === 'management' && (
               <div className="space-y-8">
+                {/* Pending Providers Approval */}
+                <div>
+                  <h2 className="text-lg font-semibold mb-2">Pending Provider Approvals</h2>
+                  <table className="min-w-full divide-y divide-gray-200">
+                    <thead>
+                      <tr>
+                        <th className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('admin.name') || 'الاسم'}</th>
+                        <th className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('admin.email') || 'البريد الإلكتروني'}</th>
+                        <th className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('admin.category') || 'الفئة'}</th>
+                        <th className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('admin.actions') || 'إجراءات'}</th>
+                      </tr>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-gray-100">
+                      {pendingProviders.length === 0 ? (
+                        <tr><td colSpan={4} className="text-center py-4 text-gray-500">No pending providers.</td></tr>
+                      ) : pendingProviders.map(provider => (
+                        <tr key={provider.id}>
+                          <td className="px-2 py-2 whitespace-nowrap">{provider.name}</td>
+                          <td className="px-2 py-2 whitespace-nowrap">{provider.email}</td>
+                          <td className="px-2 py-2 whitespace-nowrap">{provider.category}</td>
+                          <td className="px-2 py-2 whitespace-nowrap">
+                            <button onClick={() => approveProvider(provider.id)} className="bg-green-600 text-white px-3 py-1 rounded-lg text-xs mr-2">Approve</button>
+                            <button onClick={() => rejectProvider(provider.id)} className="bg-red-600 text-white px-3 py-1 rounded-lg text-xs mr-2">Reject</button>
+                            <button onClick={() => openDetails(provider)} className="bg-blue-600 text-white px-3 py-1 rounded-lg text-xs">View Details</button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
                 <div>
                   <h2 className="text-lg font-semibold mb-2">{t('admin.doctorApplications') || 'طلبات الأطباء'}</h2>
                   <table className="min-w-full divide-y divide-gray-200">
@@ -279,10 +383,10 @@ const AdminDashboard: React.FC = () => {
                     <div key={blog.id} className="bg-white border border-gray-100 rounded-xl shadow-sm hover:shadow-lg transition-all duration-200 overflow-hidden flex flex-col">
                       <img src={blog.image} alt={blog.title} className="w-full h-40 object-cover" />
                       <div className="p-4 flex-1 flex flex-col">
-                        <h3 className="text-lg font-semibold text-gray-900 mb-2">{blog.title}</h3>
-                        <p className="text-gray-600 text-sm mb-4 flex-1">{blog.content.slice(0, 90)}...</p>
+                        <h3 className="text-lg font-semibold text-gray-900 mb-2">{t(`blog.${blog.id}.title`) || blog.title}</h3>
+                        <p className="text-gray-600 text-sm mb-4 flex-1">{t(`blog.${blog.id}.content`) || (blog.content.slice(0, 90) + '...')}</p>
                         <div className="flex items-center justify-between text-xs text-gray-500 mb-2">
-                          <span>{blog.author}</span>
+                          <span>{t(`blog.${blog.id}.author`) || blog.author}</span>
                           <span>{blog.date}</span>
                         </div>
                         <button onClick={() => handleDeleteBlog(blog.id)} className="mt-auto bg-red-100 text-red-700 px-3 py-1 rounded-lg flex items-center gap-1 text-xs hover:bg-red-200">
@@ -294,9 +398,60 @@ const AdminDashboard: React.FC = () => {
                 </div>
               </div>
             )}
+
+            {/* Audit Logs Tab */}
+            {activeTab === 'auditLogs' && (
+              <div className="space-y-6">
+                <h2 className="text-lg font-semibold mb-2">Audit Logs</h2>
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead>
+                    <tr>
+                      <th className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Timestamp</th>
+                      <th className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Admin</th>
+                      <th className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Provider</th>
+                      <th className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
+                      <th className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Reason</th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-100">
+                    {(JSON.parse(localStorage.getItem('auditLogs') || '[]') as any[]).map((log, idx) => (
+                      <tr key={idx}>
+                        <td className="px-2 py-2 whitespace-nowrap">{log.timestamp}</td>
+                        <td className="px-2 py-2 whitespace-nowrap">{log.adminId}</td>
+                        <td className="px-2 py-2 whitespace-nowrap">{log.providerId}</td>
+                        <td className="px-2 py-2 whitespace-nowrap">{log.action}</td>
+                        <td className="px-2 py-2 whitespace-nowrap">{log.reason || '-'}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
           </div>
         </div>
       </div>
+      <Dialog open={detailsOpen} onClose={closeDetails} maxWidth="sm" fullWidth>
+        <DialogTitle>Provider Details</DialogTitle>
+        <DialogContent>
+          {selectedProvider && (
+            <div className="space-y-2">
+              <img src={selectedProvider.photo} alt={selectedProvider.name} className="w-24 h-24 rounded-lg object-cover mb-2" />
+              <div><strong>Name:</strong> {selectedProvider.name}</div>
+              <div><strong>Email:</strong> {selectedProvider.email}</div>
+              <div><strong>Category:</strong> {selectedProvider.category}</div>
+              <div><strong>Specialization:</strong> {selectedProvider.subcategory}</div>
+              <div><strong>Location:</strong> {selectedProvider.location}</div>
+              <div><strong>Experience:</strong> {selectedProvider.experience} years</div>
+              <div><strong>Bio:</strong> {selectedProvider.bio}</div>
+            </div>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => { if (selectedProvider) approveProvider(selectedProvider.id); closeDetails(); }} color="success">Approve</Button>
+          <Button onClick={() => { if (selectedProvider) rejectProvider(selectedProvider.id); closeDetails(); }} color="error">Reject</Button>
+          <Button onClick={closeDetails}>Close</Button>
+        </DialogActions>
+      </Dialog>
     </div>
   );
 };

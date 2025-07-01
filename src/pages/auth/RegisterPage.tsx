@@ -18,16 +18,18 @@ const RegisterPage: React.FC = () => {
     confirmPassword: '',
     name: '',
     phone: '',
-    role: searchParams.get('role') || 'user',
-    language: 'en',
+    role: (searchParams.get('role') as 'user' | 'provider' | 'admin' | 'evaluator') || 'user',
+    language: 'en' as 'ar' | 'en' | 'de',
     // Provider-specific fields
     category: '',
     subcategory: '',
     location: '',
     experience: '',
-    bio: ''
+    bio: '',
+    isApproved: 'pending' as true | false | 'pending' | 'rejected',
   });
   const [error, setError] = useState('');
+  const [photoFile, setPhotoFile] = useState<File | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -43,7 +45,21 @@ const RegisterPage: React.FC = () => {
       return;
     }
 
-    const success = await register(formData);
+    let photoUrl = '';
+    if (formData.role === 'provider' && photoFile) {
+      photoUrl = `/provider-photos/${Date.now()}_${photoFile.name}`;
+    }
+
+    let isApproved: true | false | 'pending' | 'rejected' = formData.isApproved;
+    if (formData.role === 'provider' && (formData.isApproved === 'rejected' || formData.isApproved === undefined)) {
+      isApproved = 'pending';
+    }
+
+    const success = await register({
+      ...formData,
+      photo: photoUrl,
+      isApproved,
+    });
     if (success) {
       navigate('/dashboard');
     } else {
@@ -56,6 +72,12 @@ const RegisterPage: React.FC = () => {
       ...prev,
       [e.target.name]: e.target.value
     }));
+  };
+
+  const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setPhotoFile(e.target.files[0]);
+    }
   };
 
   const getSubcategories = (categoryId: string) => {
@@ -81,6 +103,12 @@ const RegisterPage: React.FC = () => {
             {error && (
               <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
                 {error}
+              </div>
+            )}
+
+            {formData.role === 'provider' && formData.isApproved === 'rejected' && (
+              <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
+                Your application was rejected. Please review your information and resubmit.
               </div>
             )}
 
@@ -279,7 +307,7 @@ const RegisterPage: React.FC = () => {
                     value={formData.location}
                     onChange={handleInputChange}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    placeholder="City, State"
+                    placeholder={t('home.location')}
                   />
                 </div>
 
@@ -316,6 +344,22 @@ const RegisterPage: React.FC = () => {
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     placeholder="Brief description of your services and expertise"
                   />
+                </div>
+
+                {/* Photo Upload */}
+                <div>
+                  <label htmlFor="photo" className="block text-sm font-medium text-gray-700 mb-1">
+                    Upload Profile Photo
+                  </label>
+                  <input
+                    id="photo"
+                    name="photo"
+                    type="file"
+                    accept="image/*"
+                    onChange={handlePhotoChange}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">Your profile will not be shown publicly until approved by an admin.</p>
                 </div>
 
                 {/* Back Button */}

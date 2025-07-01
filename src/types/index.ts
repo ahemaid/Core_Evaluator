@@ -7,6 +7,8 @@ export interface User {
   rewardPoints: number;
   createdAt: string;
   language: 'en' | 'de' | 'ar';
+  photo?: string;
+  isApproved?: true | false | 'pending' | 'rejected';
 }
 
 export interface ServiceProvider {
@@ -33,6 +35,7 @@ export interface ServiceProvider {
   languages: string[];
   serviceHours: string;
   website?: string;
+  isApproved?: true | false | 'pending' | 'rejected';
 }
 
 export interface Appointment {

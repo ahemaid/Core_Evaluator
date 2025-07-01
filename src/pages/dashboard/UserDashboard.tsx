@@ -50,6 +50,24 @@ const UserDashboard: React.FC = () => {
           </div>
         </div>
 
+        {user?.role === 'provider' && (
+          <div className="mb-6">
+            {user.isApproved === 'pending' ? (
+              <div className="bg-yellow-100 border border-yellow-300 text-yellow-800 px-4 py-3 rounded-lg text-center">
+                Your application is pending approval.
+              </div>
+            ) : user.isApproved === true ? (
+              <div className="bg-green-100 border border-green-300 text-green-800 px-4 py-3 rounded-lg text-center">
+                Your application has been approved!
+              </div>
+            ) : user.isApproved === 'rejected' ? (
+              <div className="bg-red-100 border border-red-300 text-red-800 px-4 py-3 rounded-lg text-center">
+                Your application was rejected. Please review and resubmit.
+              </div>
+            ) : null}
+          </div>
+        )}
+
         {/* Tabs */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 mb-8">
           <div className="border-b border-gray-100 overflow-x-auto">

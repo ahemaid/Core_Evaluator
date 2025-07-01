@@ -11,11 +11,12 @@ const HomePage: React.FC = () => {
   const { user } = useAuth();
   const { t } = useTranslation();
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCountry, setSelectedCountry] = useState('United States');
+  const [selectedCountry, setSelectedCountry] = useState('Jordan');
   const [selectedCategory, setSelectedCategory] = useState('');
   const [providersCount, setProvidersCount] = useState(0);
   const [customersCount, setCustomersCount] = useState(0);
   const [rating, setRating] = useState(0);
+  const [selectedCity, setSelectedCity] = useState('');
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -28,9 +29,18 @@ const HomePage: React.FC = () => {
   };
 
   const countries = [
-    'United States', 'Germany', 'Saudi Arabia', 'Canada', 'United Kingdom', 
-    'Australia', 'France', 'Spain', 'Italy', 'Egypt', 'Algeria'
+    { value: 'Jordan', label: 'country.Jordan' },
+    { value: 'Algeria', label: 'country.Algeria' },
+    { value: 'Egypt', label: 'country.Egypt' },
+    { value: 'Germany', label: 'country.Germany' }
   ];
+
+  const citiesByCountry: { [key: string]: string[] } = {
+    Jordan: ['عمان', 'إربد', 'الزرقاء'],
+    Algeria: ['الجزائر العاصمة', 'وهران', 'قسنطينة'],
+    Egypt: ['القاهرة'],
+    Germany: ['برلين']
+  };
 
   const getCategoryIcon = (iconName: string) => {
     const icons = {
@@ -120,7 +130,7 @@ const HomePage: React.FC = () => {
                     className="w-full p-2 sm:p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
                   >
                     {countries.map(country => (
-                      <option key={country} value={country}>{country}</option>
+                      <option key={country.value} value={country.value}>{t(country.label)}</option>
                     ))}
                   </select>
                 </div>
@@ -133,7 +143,7 @@ const HomePage: React.FC = () => {
                     onChange={(e) => setSelectedCategory(e.target.value)}
                     className="w-full p-2 sm:p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
                   >
-                    <option value="">All Categories</option>
+                    <option value="">{t('common.allCategories')}</option>
                     {serviceCategories.map(category => (
                       <option key={category.id} value={category.id}>
                         {t(`category.${category.id}`)}
@@ -143,18 +153,21 @@ const HomePage: React.FC = () => {
                 </div>
 
                 {/* Location Search */}
+                {/* Removed input for city text search */}
+
+                {/* City Selection */}
                 <div className="space-y-2">
-                  <label className="text-xs sm:text-sm font-medium text-gray-700">{t('home.location')}</label>
-                  <div className="relative">
-                    <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-                    <input
-                      type="text"
-                      placeholder="City, State"
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      className="w-full pl-10 pr-4 py-2 sm:py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
-                    />
-                  </div>
+                  <label className="text-xs sm:text-sm font-medium text-gray-700">اختر المدينة</label>
+                  <select
+                    value={selectedCity}
+                    onChange={(e) => setSelectedCity(e.target.value)}
+                    className="w-full p-2 sm:p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                  >
+                    <option value="">اختر المدينة</option>
+                    {(citiesByCountry[selectedCountry] || []).map(city => (
+                      <option key={city} value={city}>{city}</option>
+                    ))}
+                  </select>
                 </div>
 
                 {/* Search Button */}
@@ -315,10 +328,10 @@ const HomePage: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-8 md:mb-12">
             <h2 className="text-xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-2 md:mb-4">
-              {t('home.latestBlogs') || 'أحدث المقالات'}
+              {t('home.latestBlogs')}
             </h2>
             <p className="text-base sm:text-xl text-gray-600 max-w-2xl md:max-w-3xl mx-auto">
-              {t('home.latestBlogsDesc') || 'اقرأ أحدث المقالات حول الصحة والخدمات الطبية.'}
+              {t('home.latestBlogsDesc')}
             </p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
@@ -326,14 +339,14 @@ const HomePage: React.FC = () => {
               <Link to={`/blog/${blog.id}`} key={blog.id} className="bg-white border border-gray-100 rounded-xl shadow-sm hover:shadow-lg transition-all duration-200 overflow-hidden flex flex-col">
                 <img src={blog.image} alt={blog.title} className="w-full h-48 object-cover" />
                 <div className="p-4 flex-1 flex flex-col">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">{blog.title}</h3>
-                  <p className="text-gray-600 text-sm mb-4 flex-1">{blog.content.slice(0, 90)}...</p>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">{t(`blog.${blog.id}.title`) || blog.title}</h3>
+                  <p className="text-gray-600 text-sm mb-4 flex-1">{t(`blog.${blog.id}.content`) || (blog.content.slice(0, 90) + '...')}</p>
                   <div className="flex items-center justify-between text-xs text-gray-500 mb-2">
-                    <span>{blog.author}</span>
+                    <span>{t(`blog.${blog.id}.author`) || blog.author}</span>
                     <span>{blog.date}</span>
                   </div>
                   <span className="mt-auto bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 py-2 rounded-lg hover:shadow-lg transition-all duration-200 text-sm text-center cursor-pointer">
-                    {t('home.readMore') || 'اقرأ المزيد'}
+                    {t('home.readMore')}
                   </span>
                 </div>
               </Link>

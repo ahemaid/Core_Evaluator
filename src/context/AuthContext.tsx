@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { User } from '../types';
+import { User, ServiceProvider } from '../types';
+import { mockProviders } from '../data/mockData';
 
 interface AuthContextType {
   user: User | null;
@@ -75,10 +76,51 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         rewardPoints: 0,
         createdAt: new Date().toISOString(),
         language: (userData.language as 'en' | 'de' | 'ar') || 'ar',
+        photo: userData.photo,
+        isApproved: userData.isApproved,
       };
       
       setUser(newUser);
       localStorage.setItem('user', JSON.stringify(newUser));
+
+      // If provider, add a complete ServiceProvider object to localStorage.providers
+      if (newUser.role === 'provider') {
+        let providers: ServiceProvider[] = [];
+        const stored = localStorage.getItem('providers');
+        if (stored) {
+          providers = JSON.parse(stored);
+        } else {
+          providers = mockProviders;
+        }
+        const newProvider: ServiceProvider = {
+          id: newUser.id,
+          name: newUser.name,
+          email: newUser.email,
+          phone: newUser.phone,
+          category: (userData as any).category || '',
+          subcategory: (userData as any).subcategory || '',
+          location: (userData as any).location || '',
+          country: 'Unknown',
+          experience: Number((userData as any).experience) || 0,
+          rating: 0,
+          reviewCount: 0,
+          price: 0,
+          priceUnit: '',
+          waitTime: '',
+          photo: userData.photo || '',
+          badges: [],
+          isVerified: false,
+          isActive: true,
+          bio: (userData as any).bio || '',
+          credentials: [],
+          languages: [userData.language as string || 'en'],
+          serviceHours: '',
+          website: '',
+          isApproved: 'pending',
+        };
+        providers.push(newProvider);
+        localStorage.setItem('providers', JSON.stringify(providers));
+      }
       return true;
     } catch (error) {
       return false;

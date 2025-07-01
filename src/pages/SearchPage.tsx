@@ -2,32 +2,53 @@ import React, { useState, useEffect } from 'react';
 import { Search, Filter, SlidersHorizontal, Star, MapPin } from 'lucide-react';
 import { useSearchParams } from 'react-router-dom';
 import ServiceProviderCard from '../components/ServiceProviderCard';
-import { mockProviders } from '../data/mockData';
-import { ServiceProvider, SearchFilters } from '../types';
+import { mockProviders, mockAppointments as initialMockAppointments } from '../data/mockData';
+import { ServiceProvider, SearchFilters, Appointment } from '../types';
 import { useAuth } from '../context/AuthContext';
 import { useTranslation } from '../utils/translations';
 import { serviceCategories } from '../data/categories';
+import Select from '@mui/material/Select';
+import MenuItem from '@mui/material/MenuItem';
+import StarIcon from '@mui/icons-material/Star';
+import StarHalfIcon from '@mui/icons-material/StarHalf';
+import StarBorderIcon from '@mui/icons-material/StarBorder';
 
 const SearchPage: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const { user } = useAuth();
-  const { t } = useTranslation(user?.language || 'en');
+  const { t } = useTranslation();
   const [providers, setProviders] = useState<ServiceProvider[]>(mockProviders);
   const [showFilters, setShowFilters] = useState(false);
   const [filters, setFilters] = useState<SearchFilters>({
     category: searchParams.get('category') || '',
     subcategory: searchParams.get('subcategory') || '',
     location: searchParams.get('q') || '',
-    country: searchParams.get('country') || 'United States',
+    country: searchParams.get('country') || 'Jordan',
     priceRange: [0, 500],
     rating: 0,
     sortBy: 'rating'
   });
+  const [appointments, setAppointments] = useState<Appointment[]>(() => {
+    const stored = localStorage.getItem('appointments');
+    if (stored) return JSON.parse(stored);
+    return initialMockAppointments;
+  });
 
   const countries = [
-    'United States', 'Germany', 'Saudi Arabia', 'Canada', 'United Kingdom', 
-    'Australia', 'France', 'Spain', 'Italy'
+    { value: 'Jordan', label: 'country.Jordan' },
+    { value: 'Algeria', label: 'country.Algeria' },
+    { value: 'Egypt', label: 'country.Egypt' },
+    { value: 'Germany', label: 'country.Germany' }
   ];
+
+  const citiesByCountry: { [key: string]: string[] } = {
+    Jordan: ['عمان', 'إربد', 'الزرقاء'],
+    Algeria: ['الجزائر العاصمة', 'وهران', 'قسنطينة'],
+    Egypt: ['القاهرة'],
+    Germany: ['برلين']
+  };
+
+  const [selectedCity, setSelectedCity] = useState('');
 
   const getSubcategories = (categoryId: string) => {
     const category = serviceCategories.find(cat => cat.id === categoryId);
@@ -37,6 +58,9 @@ const SearchPage: React.FC = () => {
   useEffect(() => {
     // Filter and sort providers based on current filters
     let filteredProviders = [...mockProviders];
+
+    // Hide unapproved providers
+    filteredProviders = filteredProviders.filter(provider => provider.isApproved !== false);
 
     if (filters.category) {
       filteredProviders = filteredProviders.filter(provider => 
@@ -86,18 +110,55 @@ const SearchPage: React.FC = () => {
     setProviders(filteredProviders);
   }, [filters]);
 
+  useEffect(() => {
+    localStorage.setItem('appointments', JSON.stringify(appointments));
+  }, [appointments]);
+
   const handleFilterChange = (key: keyof SearchFilters, value: any) => {
     setFilters(prev => ({ ...prev, [key]: value }));
   };
 
-  const handleBooking = (providerId: string) => {
+  const handleBooking = (providerId: string, bookingDate?: Date) => {
     if (!user) {
       // Redirect to login
       return;
     }
-    // Handle booking logic
-    console.log('Booking provider:', providerId);
+    if (!bookingDate) return;
+    const provider = mockProviders.find(p => p.id === providerId);
+    if (!provider) return;
+    // Format date and time
+    const dateStr = bookingDate.toLocaleDateString('en-CA'); // YYYY-MM-DD
+    const timeStr = bookingDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    const newAppointment: Appointment = {
+      id: Date.now().toString(),
+      userId: user.id,
+      providerId: provider.id,
+      date: dateStr,
+      time: timeStr,
+      status: 'confirmed',
+      notes: '',
+      hasReview: false,
+      hasReceipt: false,
+      serviceType: provider.subcategory,
+    };
+    setAppointments(prev => [...prev, newAppointment]);
+    // Optionally show a toast/alert here
   };
+
+  // Helper function for city key
+  function getCityKey(city: string) {
+    switch (city) {
+      case 'عمان': return 'Amman';
+      case 'إربد': return 'Irbid';
+      case 'الزرقاء': return 'Zarqa';
+      case 'الجزائر العاصمة': return 'Algiers';
+      case 'وهران': return 'Oran';
+      case 'قسنطينة': return 'Constantine';
+      case 'القاهرة': return 'Cairo';
+      case 'برلين': return 'Berlin';
+      default: return city;
+    }
+  }
 
   return (
     <div className="min-h-screen bg-gray-50" dir={user?.language === 'ar' ? 'rtl' : 'ltr'}>
@@ -106,16 +167,7 @@ const SearchPage: React.FC = () => {
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-8">
           <div className="flex flex-col lg:flex-row gap-4">
             {/* Search Input */}
-            <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-              <input
-                type="text"
-                placeholder="Search by location, provider name..."
-                value={filters.location}
-                onChange={(e) => handleFilterChange('location', e.target.value)}
-                className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-            </div>
+            {/* Removed input for city text search */}
 
             {/* Quick Filters */}
             <div className="flex gap-3">
@@ -124,7 +176,7 @@ const SearchPage: React.FC = () => {
                 onChange={(e) => handleFilterChange('category', e.target.value)}
                 className="px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               >
-                <option value="">All Categories</option>
+                <option value="">{t('common.allCategories')}</option>
                 {serviceCategories.map(category => (
                   <option key={category.id} value={category.id}>
                     {t(`category.${category.id}`)}
@@ -137,9 +189,9 @@ const SearchPage: React.FC = () => {
                 onChange={(e) => handleFilterChange('sortBy', e.target.value as any)}
                 className="px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               >
-                <option value="rating">Sort by Rating</option>
-                <option value="price">Sort by Price</option>
-                <option value="waitTime">Sort by Wait Time</option>
+                <option value="rating">{t('common.sortByRating')}</option>
+                <option value="price">{t('common.sortByPrice')}</option>
+                <option value="waitTime">{t('common.sortByWaitTime')}</option>
               </select>
 
               <button
@@ -147,7 +199,7 @@ const SearchPage: React.FC = () => {
                 className="flex items-center space-x-2 px-4 py-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
               >
                 <SlidersHorizontal className="h-5 w-5" />
-                <span>Filters</span>
+                <span>{t('common.filters')}</span>
               </button>
             </div>
           </div>
@@ -157,27 +209,41 @@ const SearchPage: React.FC = () => {
             <div className="mt-6 pt-6 border-t border-gray-100">
               <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Country</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">{t('common.country')}</label>
                   <select
                     value={filters.country}
                     onChange={(e) => handleFilterChange('country', e.target.value)}
                     className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   >
                     {countries.map(country => (
-                      <option key={country} value={country}>{country}</option>
+                      <option key={country.value} value={country.value}>{t(country.label)}</option>
                     ))}
                   </select>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Subcategory</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">{t('common.city')}</label>
+                  <select
+                    value={selectedCity}
+                    onChange={(e) => handleFilterChange('location', e.target.value)}
+                    className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  >
+                    <option value="">{t('common.selectCity')}</option>
+                    {(citiesByCountry[filters.country] || []).map(city => (
+                      <option key={city} value={city}>{t(`city.${getCityKey(city)}`)}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">{t('home.category')}</label>
                   <select
                     value={filters.subcategory}
                     onChange={(e) => handleFilterChange('subcategory', e.target.value)}
                     className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     disabled={!filters.category}
                   >
-                    <option value="">All Subcategories</option>
+                    <option value="">{t('common.allSubcategories')}</option>
                     {getSubcategories(filters.category).map(subcategory => (
                       <option key={subcategory} value={subcategory}>{subcategory}</option>
                     ))}
@@ -185,31 +251,61 @@ const SearchPage: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Min Rating</label>
-                  <select
+                  <label className="block text-sm font-medium text-gray-700 mb-2">{t('common.minRating')}</label>
+                  <Select
                     value={filters.rating}
                     onChange={(e) => handleFilterChange('rating', Number(e.target.value))}
-                    className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    fullWidth
+                    displayEmpty
+                    size="small"
+                    sx={{ backgroundColor: 'white', borderRadius: 2 }}
                   >
-                    <option value={0}>Any Rating</option>
-                    <option value={4}>4+ Stars</option>
-                    <option value={4.5}>4.5+ Stars</option>
-                    <option value={4.8}>4.8+ Stars</option>
-                  </select>
+                    <MenuItem value={0}>{t('common.anyRating')}</MenuItem>
+                    <MenuItem value={4}>
+                      <span style={{ color: '#FFD700', fontSize: '1.1em', display: 'flex', alignItems: 'center' }}>
+                        <StarIcon fontSize="small" />
+                        <StarIcon fontSize="small" />
+                        <StarIcon fontSize="small" />
+                        <StarIcon fontSize="small" />
+                        <StarBorderIcon fontSize="small" />
+                      </span>
+                      <span style={{ marginLeft: 8 }}>4+</span>
+                    </MenuItem>
+                    <MenuItem value={4.5}>
+                      <span style={{ color: '#FFD700', fontSize: '1.1em', display: 'flex', alignItems: 'center' }}>
+                        <StarIcon fontSize="small" />
+                        <StarIcon fontSize="small" />
+                        <StarIcon fontSize="small" />
+                        <StarIcon fontSize="small" />
+                        <StarHalfIcon fontSize="small" />
+                      </span>
+                      <span style={{ marginLeft: 8 }}>4.5+</span>
+                    </MenuItem>
+                    <MenuItem value={4.8}>
+                      <span style={{ color: '#FFD700', fontSize: '1.1em', display: 'flex', alignItems: 'center' }}>
+                        <StarIcon fontSize="small" />
+                        <StarIcon fontSize="small" />
+                        <StarIcon fontSize="small" />
+                        <StarIcon fontSize="small" />
+                        <StarIcon fontSize="small" />
+                      </span>
+                      <span style={{ marginLeft: 8 }}>4.8+</span>
+                    </MenuItem>
+                  </Select>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Max Price</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">{t('common.maxPrice')}</label>
                   <select
                     value={filters.priceRange[1]}
                     onChange={(e) => handleFilterChange('priceRange', [0, Number(e.target.value)])}
                     className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   >
-                    <option value={500}>Any Price</option>
-                    <option value={50}>Under $50</option>
-                    <option value={100}>Under $100</option>
-                    <option value={200}>Under $200</option>
-                    <option value={300}>Under $300</option>
+                    <option value={500}>{t('common.anyPrice')}</option>
+                    <option value={50}>{t('common.under50')}</option>
+                    <option value={100}>{t('common.under100')}</option>
+                    <option value={200}>{t('common.under200')}</option>
+                    <option value={300}>{t('common.under300')}</option>
                   </select>
                 </div>
 
@@ -219,14 +315,14 @@ const SearchPage: React.FC = () => {
                       category: '',
                       subcategory: '',
                       location: '',
-                      country: 'United States',
+                      country: 'Jordan',
                       priceRange: [0, 500],
                       rating: 0,
                       sortBy: 'rating'
                     })}
                     className="w-full px-4 py-3 text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
                   >
-                    Clear Filters
+                    {t('common.clearFilters')}
                   </button>
                 </div>
               </div>
@@ -237,10 +333,10 @@ const SearchPage: React.FC = () => {
         {/* Results */}
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-2xl font-bold text-gray-900">
-            {providers.length} Providers Found
+            {providers.length} {t('common.providersFound')}
           </h2>
           <div className="text-sm text-gray-600">
-            Showing qualified and verified providers
+            {t('common.showingQualifiedProviders')}
           </div>
         </div>
 

@@ -80,7 +80,7 @@ export const translations: {
   'home.whyChoose': {
     en: 'Why Choose ServicePro?',
     de: 'Warum ServicePro wählen?',
-    ar: 'لماذا تختار ServicePro؟'
+    ar: '؟ServicePro لماذا تختار '
   },
   'home.whyChooseSubtitle': {
     en: 'We prioritize quality over popularity, ensuring you connect with the most qualified service providers.',
@@ -210,6 +210,121 @@ export const translations: {
     en: 'points',
     de: 'Punkte',
     ar: 'نقاط'
+  },
+  'common.cancel': {
+    en: 'Cancel',
+    de: 'Abbrechen',
+    ar: 'إلغاء'
+  },
+  'common.confirm': {
+    en: 'Confirm',
+    de: 'Bestätigen',
+    ar: 'تأكيد'
+  },
+  'common.allCategories': {
+    en: 'All Categories',
+    de: 'Alle Kategorien',
+    ar: 'كل الفئات'
+  },
+  'common.filters': {
+    en: 'Filters',
+    de: 'Filter',
+    ar: 'الفلاتر'
+  },
+  'common.clearFilters': {
+    en: 'Clear Filters',
+    de: 'Filter zurücksetzen',
+    ar: 'مسح الفلاتر'
+  },
+  'common.sortByRating': {
+    en: 'Sort by Rating',
+    de: 'Nach Bewertung sortieren',
+    ar: 'ترتيب حسب التقييم'
+  },
+  'common.sortByPrice': {
+    en: 'Sort by Price',
+    de: 'Nach Preis sortieren',
+    ar: 'ترتيب حسب السعر'
+  },
+  'common.sortByWaitTime': {
+    en: 'Sort by Wait Time',
+    de: 'Nach Wartezeit sortieren',
+    ar: 'ترتيب حسب وقت الانتظار'
+  },
+  'common.minRating': {
+    en: 'Min Rating',
+    de: 'Mindestbewertung',
+    ar: 'الحد الأدنى للتقييم'
+  },
+  'common.maxPrice': {
+    en: 'Max Price',
+    de: 'Höchstpreis',
+    ar: 'أقصى سعر'
+  },
+  'common.anyRating': {
+    en: 'Any Rating',
+    de: 'Beliebige Bewertung',
+    ar: 'أي تقييم'
+  },
+  'common.anyPrice': {
+    en: 'Any Price',
+    de: 'Beliebiger Preis',
+    ar: 'أي سعر'
+  },
+  'common.under50': {
+    en: 'Under $50',
+    de: 'Unter 50 $',
+    ar: '50$ أقل من'
+  },
+  'common.under100': {
+    en: 'Under $100',
+    de: 'Unter 100 $',
+    ar: '100$ أقل من'
+  },
+  'common.under200': {
+    en: 'Under $200',
+    de: 'Unter 200 $',
+    ar: '200$ أقل من'
+  },
+  'common.under300': {
+    en: 'Under $300',
+    de: 'Unter 300 $',
+    ar: '300$ أقل من'
+  },
+  'common.allSubcategories': {
+    en: 'All Subcategories',
+    de: 'Alle Unterkategorien',
+    ar: 'كل التخصصات الفرعية'
+  },
+  'common.country': {
+    en: 'Country',
+    de: 'Land',
+    ar: 'الدولة'
+  },
+  'common.city': {
+    en: 'City',
+    de: 'Stadt',
+    ar: 'المدينة'
+  },
+  'common.selectCity': {
+    en: 'Select City',
+    de: 'Stadt auswählen',
+    ar: 'اختر المدينة'
+  },
+  'common.providersFound': {
+    en: 'Providers Found',
+    de: 'Anbieter gefunden',
+    ar: 'مقدمو الخدمات الذين تم العثور عليهم'
+  },
+  'common.showingQualifiedProviders': {
+    en: 'Showing qualified and verified providers',
+    de: 'Anzeige qualifizierter und verifizierter Anbieter',
+    ar: 'عرض مقدمي الخدمات المؤهلين والمعتمدين'
+  },
+  'common.hours': {
+    en: 'Hours:',
+    de: 'Öffnungszeiten:',
+    ar: 'ساعات العمل:'
   },
 
   // Features
@@ -979,6 +1094,112 @@ export const translations: {
     en: 'Delete',
     de: 'Löschen',
     ar: 'حذف'
+  },
+  'country.Jordan': {
+    en: 'Jordan',
+    de: 'Jordanien',
+    ar: 'الأردن'
+  },
+  'country.Algeria': {
+    en: 'Algeria',
+    de: 'Algerien',
+    ar: 'الجزائر'
+  },
+  'country.Egypt': {
+    en: 'Egypt',
+    de: 'Ägypten',
+    ar: 'مصر'
+  },
+  'country.Germany': {
+    en: 'Germany',
+    de: 'Deutschland',
+    ar: 'ألمانيا'
+  },
+  'city.Amman': {
+    en: 'Amman',
+    de: 'Amman',
+    ar: 'عمان'
+  },
+  'city.Irbid': {
+    en: 'Irbid',
+    de: 'Irbid',
+    ar: 'إربد'
+  },
+  'city.Zarqa': {
+    en: 'Zarqa',
+    de: 'Zarqa',
+    ar: 'الزرقاء'
+  },
+  'city.Algiers': {
+    en: 'Algiers',
+    de: 'Algier',
+    ar: 'الجزائر العاصمة'
+  },
+  'city.Oran': {
+    en: 'Oran',
+    de: 'Oran',
+    ar: 'وهران'
+  },
+  'city.Constantine': {
+    en: 'Constantine',
+    de: 'Constantine',
+    ar: 'قسنطينة'
+  },
+  'city.Cairo': {
+    en: 'Cairo',
+    de: 'Kairo',
+    ar: 'القاهرة'
+  },
+  'city.Berlin': {
+    en: 'Berlin',
+    de: 'Berlin',
+    ar: 'برلين'
+  },
+  // Blog Translations
+  'blog.1.title': {
+    en: 'How to Choose the Right Doctor for Your Needs',
+    de: 'Wie Sie den richtigen Arzt für Ihre Bedürfnisse wählen',
+    ar: 'كيف تختار الطبيب المناسب لاحتياجاتك'
+  },
+  'blog.1.content': {
+    en: 'Choosing the right doctor is crucial for your health. In this article, we discuss the main factors to consider, including qualifications, reviews, and communication style...',
+    de: 'Die Wahl des richtigen Arztes ist entscheidend für Ihre Gesundheit. In diesem Artikel besprechen wir die wichtigsten Faktoren, darunter Qualifikationen, Bewertungen und Kommunikationsstil...',
+    ar: 'اختيار الطبيب المناسب أمر بالغ الأهمية لصحتك. في هذا المقال، نناقش العوامل الرئيسية التي يجب مراعاتها، بما في ذلك المؤهلات، والتقييمات، وأسلوب التواصل...'
+  },
+  'blog.1.author': {
+    en: 'Admin',
+    de: 'Verwaltung',
+    ar: 'الإدارة'
+  },
+  'blog.2.title': {
+    en: 'The Importance of Regular Health Checkups',
+    de: 'Die Bedeutung regelmäßiger Gesundheitschecks',
+    ar: 'أهمية الفحوصات الصحية الدورية'
+  },
+  'blog.2.content': {
+    en: 'Regular health checkups help detect problems early and improve treatment and recovery chances. Learn why you should not skip your annual checkup...',
+    de: 'Regelmäßige Gesundheitschecks helfen, Probleme frühzeitig zu erkennen und die Chancen auf Behandlung und Genesung zu verbessern. Erfahren Sie, warum Sie Ihren jährlichen Check nicht auslassen sollten...'
+    ,ar: 'الفحوصات الصحية الدورية تساعد في اكتشاف المشاكل مبكرًا وتحسين فرص العلاج والشفاء. تعرف على أهمية عدم إهمال الفحص السنوي...'
+  },
+  'blog.2.author': {
+    en: 'Dr. Mona Khaled',
+    de: 'Dr. Mona Khaled',
+    ar: 'د. منى خالد'
+  },
+  'blog.3.title': {
+    en: 'Understanding Doctor Ratings and Reviews',
+    de: 'Arztbewertungen und Rezensionen verstehen',
+    ar: 'فهم تقييمات ومراجعات الأطباء'
+  },
+  'blog.3.content': {
+    en: 'Doctor ratings and reviews are a useful tool when choosing a provider. Learn how to interpret them and what to look for...',
+    de: 'Arztbewertungen und Rezensionen sind ein nützliches Werkzeug bei der Auswahl eines Anbieters. Erfahren Sie, wie Sie sie interpretieren und worauf Sie achten sollten...'
+    ,ar: 'تقييمات ومراجعات الأطباء أداة مفيدة عند اختيار مقدم الخدمة. تعرف كيف تفسرها وما الذي يجب البحث عنه...'
+  },
+  'blog.3.author': {
+    en: 'Admin',
+    de: 'Verwaltung',
+    ar: 'الإدارة'
   },
 };
 

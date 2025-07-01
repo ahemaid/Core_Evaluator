@@ -29,12 +29,12 @@ const BlogPage: React.FC = () => {
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
           <img src={blog.image} alt={blog.title} className="w-full h-64 object-cover" />
           <div className="p-6">
-            <h1 className="text-2xl font-bold text-gray-900 mb-2">{blog.title}</h1>
+            <h1 className="text-2xl font-bold text-gray-900 mb-2">{t(`blog.${blog.id}.title`) || blog.title}</h1>
             <div className="flex items-center justify-between text-xs text-gray-500 mb-4">
-              <span>{blog.author}</span>
+              <span>{t(`blog.${blog.id}.author`) || blog.author}</span>
               <span>{blog.date}</span>
             </div>
-            <div className="text-gray-700 text-base whitespace-pre-line">{blog.content}</div>
+            <div className="text-gray-700 text-base whitespace-pre-line">{t(`blog.${blog.id}.content`) || blog.content}</div>
           </div>
         </div>
       </div>

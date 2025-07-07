@@ -24,7 +24,14 @@ export const mockProviders: ServiceProvider[] = [
     bio: 'طبيب قلب ذو خبرة في عمان متخصص في أمراض القلب والوقاية منها.',
     credentials: ['جامعة الأردن', 'إقامة مستشفى الأردن'],
     languages: ['العربية'],
-    serviceHours: 'الأحد-الخميس 9ص-5م'
+    serviceHours: 'الأحد-الخميس 9ص-5م',
+    availability: [
+      { day: 'Sunday', start: '09:00', end: '17:00' },
+      { day: 'Monday', start: '09:00', end: '17:00' },
+      { day: 'Tuesday', start: '09:00', end: '17:00' },
+      { day: 'Wednesday', start: '09:00', end: '17:00' },
+      { day: 'Thursday', start: '09:00', end: '17:00' }
+    ],
   },
   {
     id: '2',
@@ -48,7 +55,14 @@ export const mockProviders: ServiceProvider[] = [
     bio: 'استشارية أمراض القلب في الجزائر العاصمة مع خبرة واسعة في علاج أمراض القلب والشرايين.',
     credentials: ['جامعة الجزائر', 'زمالة مستشفى مصطفى باشا الجامعي'],
     languages: ['العربية'],
-    serviceHours: 'الأحد-الخميس 8ص-4م'
+    serviceHours: 'الأحد-الخميس 8ص-4م',
+    availability: [
+      { day: 'Sunday', start: '08:00', end: '16:00' },
+      { day: 'Monday', start: '08:00', end: '16:00' },
+      { day: 'Tuesday', start: '08:00', end: '16:00' },
+      { day: 'Wednesday', start: '08:00', end: '16:00' },
+      { day: 'Thursday', start: '08:00', end: '16:00' }
+    ],
   },
   {
     id: '3',
@@ -72,7 +86,14 @@ export const mockProviders: ServiceProvider[] = [
     bio: 'طبيبة أطفال متخصصة في رعاية الأطفال وحديثي الولادة مع أكثر من 10 سنوات خبرة.',
     credentials: ['جامعة القاهرة', 'زمالة مستشفى الأطفال'],
     languages: ['العربية'],
-    serviceHours: 'السبت-الأربعاء 9ص-3م'
+    serviceHours: 'السبت-الأربعاء 9ص-3م',
+    availability: [
+      { day: 'Saturday', start: '09:00', end: '15:00' },
+      { day: 'Sunday', start: '09:00', end: '15:00' },
+      { day: 'Monday', start: '09:00', end: '15:00' },
+      { day: 'Tuesday', start: '09:00', end: '15:00' },
+      { day: 'Wednesday', start: '09:00', end: '15:00' }
+    ],
   },
   {
     id: '4',
@@ -96,7 +117,14 @@ export const mockProviders: ServiceProvider[] = [
     bio: 'طبيبة جلدية مشهورة في برلين متخصصة في العناية بالبشرة والعلاجات بالليزر.',
     credentials: ['جامعة شاريتيه – برلين', 'حاصلة على البورد الألماني'],
     languages: ['العربية'],
-    serviceHours: 'الاثنين-الجمعة 10ص-6م'
+    serviceHours: 'الاثنين-الجمعة 10ص-6م',
+    availability: [
+      { day: 'Monday', start: '10:00', end: '18:00' },
+      { day: 'Tuesday', start: '10:00', end: '18:00' },
+      { day: 'Wednesday', start: '10:00', end: '18:00' },
+      { day: 'Thursday', start: '10:00', end: '18:00' },
+      { day: 'Friday', start: '10:00', end: '18:00' }
+    ],
   },
 
   // مقدمو خدمات المطاعم

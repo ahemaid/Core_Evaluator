@@ -1,20 +1,98 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Calendar, Star, Award, Receipt, Clock, MapPin, Phone } from 'lucide-react';
 import { mockAppointments, mockProviders } from '../../data/mockData';
 import { useAuth } from '../../context/AuthContext';
 import { useTranslation } from '../../utils/translations';
+import { Appointment } from '../../types';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const UserDashboard: React.FC = () => {
-  const { user } = useAuth();
+  const { user, updateUser } = useAuth();
   const { t, language } = useTranslation();
   const [activeTab, setActiveTab] = useState('appointments');
 
-  const appointments = mockAppointments.filter(apt => apt.userId === user?.id);
-  const upcomingAppointments = appointments.filter(apt => apt.status === 'confirmed');
-  const completedAppointments = appointments.filter(apt => apt.status === 'completed');
+  const [appointments, setAppointments] = useState<Appointment[]>(() => {
+    const stored = localStorage.getItem('appointments');
+    if (stored) return JSON.parse(stored);
+    return mockAppointments;
+  });
+
+  useEffect(() => {
+    const handleStorage = () => {
+      const stored = localStorage.getItem('appointments');
+      if (stored) setAppointments(JSON.parse(stored));
+    };
+    window.addEventListener('storage', handleStorage);
+    return () => window.removeEventListener('storage', handleStorage);
+  }, []);
+
+  const userAppointments = appointments.filter((apt: Appointment) => apt.userId === user?.id);
+  const upcomingAppointments = userAppointments.filter((apt: Appointment) => apt.status === 'confirmed');
+  const completedAppointments = userAppointments.filter((apt: Appointment) => apt.status === 'completed');
 
   const getProviderById = (providerId: string) => {
     return mockProviders.find(provider => provider.id === providerId);
+  };
+
+  const handleCancel = (id: string) => {
+    const updated = appointments.map((apt: Appointment) =>
+      apt.id === id ? { ...apt, status: 'cancelled' as 'cancelled' } : apt
+    );
+    setAppointments(updated);
+    localStorage.setItem('appointments', JSON.stringify(updated));
+  };
+
+  const handleComplete = (id: string) => {
+    const updated = appointments.map((apt: Appointment) =>
+      apt.id === id ? { ...apt, status: 'completed' as 'completed' } : apt
+    );
+    setAppointments(updated);
+    localStorage.setItem('appointments', JSON.stringify(updated));
+    if (user) {
+      updateUser({ rewardPoints: user.rewardPoints + 10 });
+      toast.success(t('dashboard.completedToast') || '+10 points for completing an appointment!');
+    }
+  };
+
+  const handleReview = (id: string) => {
+    const updated = appointments.map((apt: Appointment) =>
+      apt.id === id ? { ...apt, hasReview: true } : apt
+    );
+    setAppointments(updated);
+    localStorage.setItem('appointments', JSON.stringify(updated));
+    if (user) {
+      updateUser({ rewardPoints: user.rewardPoints + 5 });
+      toast.success(t('dashboard.reviewToast') || '+5 points for leaving a review!');
+    }
+  };
+
+  const handleReceiptUpload = async (file: File, appointmentId: string) => {
+    const formData = new FormData();
+    formData.append('receipt', file);
+    formData.append('appointmentId', appointmentId);
+    try {
+      const response = await fetch('http://localhost:4000/upload-receipt', {
+        method: 'POST',
+        body: formData,
+      });
+      if (!response.ok) throw new Error('Upload failed');
+      const data = await response.json();
+      // Update appointment with receiptUrl and hasReceipt
+      const updated = appointments.map((apt: Appointment) =>
+        apt.id === appointmentId
+          ? { ...apt, hasReceipt: true, receiptUrl: data.fileUrl }
+          : apt
+      );
+      setAppointments(updated);
+      localStorage.setItem('appointments', JSON.stringify(updated));
+      if (user) {
+        updateUser({ rewardPoints: user.rewardPoints + 3 });
+      }
+      toast.success(t('dashboard.receiptToast') || '+3 points for uploading a receipt!');
+    } catch (err) {
+      toast.error('Failed to upload receipt');
+    }
   };
 
   const tabs = [
@@ -25,6 +103,7 @@ const UserDashboard: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50" dir={user?.language === 'ar' ? 'rtl' : 'ltr'}>
+      <ToastContainer position="top-center" autoClose={2000} />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-8">
@@ -100,7 +179,7 @@ const UserDashboard: React.FC = () => {
                   <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('dashboard.upcomingAppointments')}</h3>
                   {upcomingAppointments.length > 0 ? (
                     <div className="space-y-4">
-                      {upcomingAppointments.map(appointment => {
+                      {upcomingAppointments.map((appointment: Appointment) => {
                         const provider = getProviderById(appointment.providerId);
                         return (
                           <div key={appointment.id} className="bg-blue-50 border border-blue-200 rounded-lg p-4">
@@ -138,6 +217,14 @@ const UserDashboard: React.FC = () => {
                                 <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
                                   Confirmed
                                 </span>
+                                <button onClick={() => handleComplete(appointment.id)} className="ml-2 bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600 text-xs">
+                                  Complete
+                                </button>
+                                {(appointment.status !== 'completed' && appointment.status !== 'cancelled') && (
+                                  <button onClick={() => handleCancel(appointment.id)} className="ml-2 bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 text-xs">
+                                    {t('dashboard.cancel') || 'Cancel'}
+                                  </button>
+                                )}
                               </div>
                             </div>
                           </div>
@@ -153,7 +240,7 @@ const UserDashboard: React.FC = () => {
                   <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('dashboard.recentAppointments')}</h3>
                   {completedAppointments.length > 0 ? (
                     <div className="space-y-4">
-                      {completedAppointments.map(appointment => {
+                      {completedAppointments.map((appointment: Appointment) => {
                         const provider = getProviderById(appointment.providerId);
                         return (
                           <div key={appointment.id} className="bg-gray-50 border border-gray-200 rounded-lg p-4">
@@ -175,15 +262,35 @@ const UserDashboard: React.FC = () => {
                               </div>
                               <div className="flex items-center space-x-3">
                                 {!appointment.hasReview && (
-                                  <button className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700 transition-colors">
+                                  <button onClick={() => handleReview(appointment.id)} className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700 transition-colors">
                                     {t('dashboard.leaveReview')}
                                   </button>
                                 )}
                                 {!appointment.hasReceipt && (
-                                  <button className="bg-green-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-green-700 transition-colors flex items-center space-x-1">
+                                  <label className="bg-green-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-green-700 transition-colors flex items-center space-x-1 cursor-pointer">
                                     <Receipt className="h-4 w-4" />
                                     <span>{t('dashboard.uploadReceipt')}</span>
-                                  </button>
+                                    <input
+                                      type="file"
+                                      accept="image/*,application/pdf"
+                                      style={{ display: 'none' }}
+                                      onChange={e => {
+                                        if (e.target.files && e.target.files[0]) {
+                                          handleReceiptUpload(e.target.files[0], appointment.id);
+                                        }
+                                      }}
+                                    />
+                                  </label>
+                                )}
+                                {appointment.receiptUrl && (
+                                  <a
+                                    href={`http://localhost:4000${appointment.receiptUrl}`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="ml-2 text-blue-600 underline text-xs"
+                                  >
+                                    {t('dashboard.viewReceipt') || 'View Receipt'}
+                                  </a>
                                 )}
                                 <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
                                   {t('dashboard.completedStatus')}

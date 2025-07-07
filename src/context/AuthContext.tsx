@@ -9,6 +9,7 @@ interface AuthContextType {
   logout: () => void;
   isLoading: boolean;
   updateLanguage: (language: 'en' | 'de' | 'ar') => void;
+  updateUser: (partial: Partial<User>) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -141,8 +142,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.setItem('user', JSON.stringify(updatedUser));
   };
 
+  const updateUser = (partial: Partial<User>) => {
+    setUser(prev => {
+      if (!prev) return prev;
+      const updated = { ...prev, ...partial };
+      localStorage.setItem('user', JSON.stringify(updated));
+      return updated;
+    });
+  };
+
   return (
-    <AuthContext.Provider value={{ user, login, register, logout, isLoading, updateLanguage }}>
+    <AuthContext.Provider value={{ user, login, register, logout, isLoading, updateLanguage, updateUser }}>
       {children}
     </AuthContext.Provider>
   );

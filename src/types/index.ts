@@ -36,6 +36,7 @@ export interface ServiceProvider {
   serviceHours: string;
   website?: string;
   isApproved?: true | false | 'pending' | 'rejected';
+  availability?: { day: string; start: string; end: string }[];
 }
 
 export interface Appointment {
@@ -49,6 +50,7 @@ export interface Appointment {
   hasReview: boolean;
   hasReceipt: boolean;
   serviceType: string;
+  receiptUrl?: string;
 }
 
 export interface Review {

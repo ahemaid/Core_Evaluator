@@ -3,6 +3,10 @@ import { Star, MapPin, Clock, Award, Phone } from 'lucide-react';
 import type { ServiceProvider } from '../types';
 import { useAuth } from '../context/AuthContext';
 import { useTranslation } from '../utils/translations';
+import { Dialog, DialogTitle, DialogContent, DialogActions, Button } from '@mui/material';
+import { format, addMinutes } from 'date-fns';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 interface DoctorCardProps {
   doctor: ServiceProvider;
@@ -13,12 +17,69 @@ interface DoctorCardProps {
 const DoctorCard: React.FC<DoctorCardProps> = ({ doctor, onBook, showFullDetails = false }) => {
   const { user } = useAuth();
   const { t, language } = useTranslation();
+  const [bookingOpen, setBookingOpen] = React.useState(false);
+  const [selectedDay, setSelectedDay] = React.useState('');
+  const [selectedSlot, setSelectedSlot] = React.useState('');
 
   const handleBooking = () => {
-    if (onBook) {
+    if (user) {
+      setBookingOpen(true);
+    } else if (onBook) {
       onBook(doctor.id);
     }
   };
+
+  const handleClose = () => {
+    setBookingOpen(false);
+    setSelectedDay('');
+    setSelectedSlot('');
+  };
+
+  const handleConfirm = () => {
+    if (selectedDay && selectedSlot && user) {
+      // Create new appointment
+      const newAppointment = {
+        id: Date.now().toString(),
+        userId: user.id,
+        providerId: doctor.id,
+        date: selectedDay,
+        time: selectedSlot,
+        status: 'confirmed',
+        notes: '',
+        hasReview: false,
+        hasReceipt: false,
+        serviceType: doctor.subcategory,
+      };
+      // Save to localStorage
+      const stored = localStorage.getItem('appointments');
+      const appointments = stored ? JSON.parse(stored) : [];
+      appointments.push(newAppointment);
+      localStorage.setItem('appointments', JSON.stringify(appointments));
+      toast.success(t('common.bookingSuccess') || 'Booking successful!');
+      handleClose();
+    } else {
+      toast.error(t('common.bookingError') || 'Please select a day and time.');
+    }
+  };
+
+  const availableDays = doctor.availability || [];
+
+  function getTimeSlots(day: string) {
+    const slot = availableDays.find(d => d.day === day);
+    if (!slot) return [];
+    const slots = [];
+    let [startHour, startMinute] = slot.start.split(':').map(Number);
+    let [endHour, endMinute] = slot.end.split(':').map(Number);
+    let current = new Date();
+    current.setHours(startHour, startMinute, 0, 0);
+    const end = new Date();
+    end.setHours(endHour, endMinute, 0, 0);
+    while (current <= end) {
+      slots.push(format(new Date(current), 'HH:mm'));
+      current = addMinutes(new Date(current), 30);
+    }
+    return slots;
+  }
 
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-100 hover:shadow-lg transition-all duration-300 overflow-hidden group">
@@ -40,7 +101,7 @@ const DoctorCard: React.FC<DoctorCardProps> = ({ doctor, onBook, showFullDetails
 
           {/* Doctor Info */}
           <div className={language === 'ar' ? 'flex-1 min-w-0 text-right' : 'flex-1 min-w-0'}>
-            <div className={language === 'ar' ? 'flex items-start justify-start flex-row-reverse' : 'flex items-start justify-between'}>
+            <div className={language === 'ar' ? 'flex items-start justify-start' : 'flex items-start justify-between'}>
               <div>
                 <h3 className="text-lg font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">
                   {doctor.name}
@@ -87,7 +148,7 @@ const DoctorCard: React.FC<DoctorCardProps> = ({ doctor, onBook, showFullDetails
             </div>
 
             {/* Price and Booking */}
-            <div className={language === 'ar' ? 'flex items-center justify-start mt-4 flex-row-reverse' : 'flex items-center justify-between mt-4'}>
+            <div className={language === 'ar' ? 'flex flex-row-reverse items-center justify-start mt-4 gap-4' : 'flex flex-row items-center justify-between mt-4 gap-4'}>
               <div className="text-2xl font-bold text-gray-900">
                 ${doctor.price}
                 <span className="text-sm font-normal text-gray-500">/visit</span>
@@ -95,15 +156,73 @@ const DoctorCard: React.FC<DoctorCardProps> = ({ doctor, onBook, showFullDetails
               <button
                 onClick={handleBooking}
                 disabled={!user}
-                className={
-                  (language === 'ar'
-                    ? 'ml-auto bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-2 rounded-lg hover:shadow-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed'
-                    : 'bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-2 rounded-lg hover:shadow-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed')
-                }
+                className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-2 rounded-lg hover:shadow-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {user ? 'Book Now' : 'Login to Book'}
+                {user ? t('common.bookNow') : t('common.loginToBook')}
               </button>
             </div>
+
+            {/* Booking Modal */}
+            <Dialog
+              open={bookingOpen}
+              onClose={handleClose}
+              PaperProps={{
+                dir: language === 'ar' ? 'rtl' : 'ltr',
+                style: { direction: language === 'ar' ? 'rtl' : 'ltr' }
+              }}
+            >
+              <DialogTitle style={{ textAlign: language === 'ar' ? 'right' : 'left' }}>
+                {t('common.bookNow')}
+              </DialogTitle>
+              <DialogContent>
+                <div className="flex flex-col gap-4 mt-2" style={{ direction: language === 'ar' ? 'rtl' : 'ltr' }}>
+                  {/* Day selection */}
+                  <label className="font-medium mb-1">{t('common.selectDay')}</label>
+                  <select
+                    value={selectedDay}
+                    onChange={e => {
+                      setSelectedDay(e.target.value);
+                      setSelectedSlot('');
+                    }}
+                    className="p-2 border rounded-lg"
+                  >
+                    <option value="">{t('common.selectDay')}</option>
+                    {availableDays.map(day => (
+                      <option key={day.day} value={day.day}>{t('common.' + day.day.toLowerCase())}</option>
+                    ))}
+                  </select>
+                  {/* Time slot selection */}
+                  {selectedDay && (
+                    <>
+                      <label className="font-medium mb-1">{t('common.selectTime')}</label>
+                      <select
+                        value={selectedSlot}
+                        onChange={e => setSelectedSlot(e.target.value)}
+                        className="p-2 border rounded-lg"
+                      >
+                        <option value="">{t('common.selectTime')}</option>
+                        {getTimeSlots(selectedDay).map(slot => (
+                          <option key={slot} value={slot}>{slot}</option>
+                        ))}
+                      </select>
+                    </>
+                  )}
+                </div>
+              </DialogContent>
+              <DialogActions style={{ justifyContent: language === 'ar' ? 'flex-start' : 'flex-end' }}>
+                <Button onClick={handleClose}>
+                  {t('common.cancel') || (language === 'ar' ? 'إلغاء' : 'Cancel')}
+                </Button>
+                <Button
+                  onClick={handleConfirm}
+                  disabled={!selectedDay || !selectedSlot}
+                  variant="contained"
+                >
+                  {t('common.confirm') || (language === 'ar' ? 'تأكيد' : 'Confirm')}
+                </Button>
+              </DialogActions>
+            </Dialog>
+            {/* End Booking Modal */}
 
             {showFullDetails && (
               <div className="mt-4 pt-4 border-t border-gray-100">
@@ -134,6 +253,7 @@ const DoctorCard: React.FC<DoctorCardProps> = ({ doctor, onBook, showFullDetails
           </div>
         </div>
       </div>
+      <ToastContainer position={language === 'ar' ? 'top-left' : 'top-right'} rtl={language === 'ar'} />
     </div>
   );
 };

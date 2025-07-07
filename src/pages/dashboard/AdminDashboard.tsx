@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTranslation } from '../../utils/translations';
 import { User } from '../../types';
-import { User as UserIcon, Award, AlertTriangle, CheckCircle, XCircle, Star, ClipboardList, Plus, Trash2 } from 'lucide-react';
+import { User as UserIcon, Award, AlertTriangle, CheckCircle, XCircle, Star, ClipboardList, Plus, Trash2, Calendar } from 'lucide-react';
 import { blogs as initialBlogs, BlogPost } from '../../data/blogs';
-import { mockProviders } from '../../data/mockData';
-import { ServiceProvider } from '../../types';
+import { mockProviders, mockAppointments } from '../../data/mockData';
+import { ServiceProvider, Appointment } from '../../types';
 import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
@@ -60,6 +60,20 @@ const AdminDashboard: React.FC = () => {
   const [selectedProvider, setSelectedProvider] = useState<ServiceProvider | null>(null);
   const [detailsOpen, setDetailsOpen] = useState(false);
   const { user: adminUser } = useAuth();
+  const [appointments, setAppointments] = useState<Appointment[]>(() => {
+    const stored = localStorage.getItem('appointments');
+    if (stored) return JSON.parse(stored);
+    return mockAppointments;
+  });
+
+  useEffect(() => {
+    const handleStorage = () => {
+      const stored = localStorage.getItem('appointments');
+      if (stored) setAppointments(JSON.parse(stored));
+    };
+    window.addEventListener('storage', handleStorage);
+    return () => window.removeEventListener('storage', handleStorage);
+  }, []);
 
   // Count totals
   const totalUsers = mockUsers.length;
@@ -124,6 +138,15 @@ const AdminDashboard: React.FC = () => {
     setSelectedProvider(null);
   };
 
+  const getUserName = (userId: string) => {
+    const user = mockUsers.find(u => u.id === userId);
+    return user ? user.name : userId;
+  };
+  const getProviderName = (providerId: string) => {
+    const provider = mockProviders.find(p => p.id === providerId);
+    return provider ? provider.name : providerId;
+  };
+
   return (
     <div className="min-h-screen bg-gray-50" dir={language === 'ar' ? 'rtl' : 'ltr'}>
       <div className="max-w-6xl mx-auto px-2 sm:px-6 lg:px-8 py-8">
@@ -179,6 +202,13 @@ const AdminDashboard: React.FC = () => {
             >
               <ClipboardList className="h-5 w-5" />
               <span>Audit Logs</span>
+            </button>
+            <button
+              onClick={() => setActiveTab('appointments')}
+              className={`flex items-center space-x-1 sm:space-x-2 py-2 sm:py-4 border-b-2 transition-colors text-sm sm:text-base ${activeTab === 'appointments' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-600 hover:text-gray-900'}`}
+            >
+              <Calendar className="h-5 w-5" />
+              <span>{t('admin.appointments') || 'المواعيد'}</span>
             </button>
           </nav>
 
@@ -421,6 +451,37 @@ const AdminDashboard: React.FC = () => {
                         <td className="px-2 py-2 whitespace-nowrap">{log.providerId}</td>
                         <td className="px-2 py-2 whitespace-nowrap">{log.action}</td>
                         <td className="px-2 py-2 whitespace-nowrap">{log.reason || '-'}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+
+            {/* Appointments Tab */}
+            {activeTab === 'appointments' && (
+              <div className="space-y-6">
+                <h2 className="text-lg font-semibold mb-2">{t('admin.appointments') || 'المواعيد'}</h2>
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead>
+                    <tr>
+                      <th className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('admin.customer') || 'العميل'}</th>
+                      <th className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('admin.provider') || 'المقدم'}</th>
+                      <th className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('admin.date') || 'التاريخ'}</th>
+                      <th className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('admin.time') || 'الوقت'}</th>
+                      <th className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('admin.status') || 'الحالة'}</th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-100">
+                    {appointments.length === 0 ? (
+                      <tr><td colSpan={5} className="text-center py-4 text-gray-500">No appointments found.</td></tr>
+                    ) : appointments.map((apt: Appointment) => (
+                      <tr key={apt.id}>
+                        <td className="px-2 py-2 whitespace-nowrap">{getUserName(apt.userId)}</td>
+                        <td className="px-2 py-2 whitespace-nowrap">{getProviderName(apt.providerId)}</td>
+                        <td className="px-2 py-2 whitespace-nowrap">{apt.date}</td>
+                        <td className="px-2 py-2 whitespace-nowrap">{apt.time}</td>
+                        <td className="px-2 py-2 whitespace-nowrap">{apt.status}</td>
                       </tr>
                     ))}
                   </tbody>

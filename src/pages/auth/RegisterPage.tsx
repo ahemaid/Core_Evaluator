@@ -30,6 +30,20 @@ const RegisterPage: React.FC = () => {
   });
   const [error, setError] = useState('');
   const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+
+  const handlePhotoUpload = async (file: File, providerId: string) => {
+    const formData = new FormData();
+    formData.append('photo', file);
+    formData.append('providerId', providerId);
+    const response = await fetch('http://localhost:4000/upload-provider-photo', {
+      method: 'POST',
+      body: formData,
+    });
+    if (!response.ok) throw new Error('Photo upload failed');
+    const data = await response.json();
+    return data.fileUrl; // e.g., /provider-photos/12345.jpg
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -47,7 +61,14 @@ const RegisterPage: React.FC = () => {
 
     let photoUrl = '';
     if (formData.role === 'provider' && photoFile) {
-      photoUrl = `/provider-photos/${Date.now()}_${photoFile.name}`;
+      // Use a temporary providerId (e.g., Date.now())
+      const providerId = Date.now().toString();
+      try {
+        photoUrl = await handlePhotoUpload(photoFile, providerId);
+      } catch (err) {
+        setError('Photo upload failed');
+        return;
+      }
     }
 
     let isApproved: true | false | 'pending' | 'rejected' = formData.isApproved;
@@ -76,7 +97,28 @@ const RegisterPage: React.FC = () => {
 
   const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      setPhotoFile(e.target.files[0]);
+      const file = e.target.files[0];
+      const validTypes = ['image/jpeg', 'image/png', 'image/webp', 'application/pdf'];
+      const maxSize = 5 * 1024 * 1024; // 5MB
+      if (!validTypes.includes(file.type)) {
+        setError('Only JPG, PNG, WEBP images, or PDF files are allowed.');
+        setPhotoFile(null);
+        setPhotoPreview(null);
+        return;
+      }
+      if (file.size > maxSize) {
+        setError('File size must be less than 5MB.');
+        setPhotoFile(null);
+        setPhotoPreview(null);
+        return;
+      }
+      setError('');
+      setPhotoFile(file);
+      if (file.type === 'application/pdf') {
+        setPhotoPreview('pdf');
+      } else {
+        setPhotoPreview(URL.createObjectURL(file));
+      }
     }
   };
 
@@ -347,19 +389,30 @@ const RegisterPage: React.FC = () => {
                 </div>
 
                 {/* Photo Upload */}
-                <div>
-                  <label htmlFor="photo" className="block text-sm font-medium text-gray-700 mb-1">
-                    Upload Profile Photo
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    {t('register.photo') || 'Profile Photo'}
                   </label>
                   <input
-                    id="photo"
-                    name="photo"
                     type="file"
                     accept="image/*"
                     onChange={handlePhotoChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
                   />
-                  <p className="text-xs text-gray-500 mt-1">Your profile will not be shown publicly until approved by an admin.</p>
+                  {photoPreview && (
+                    photoPreview === 'pdf' ? (
+                      <div className="mt-2 flex items-center gap-2">
+                        <span className="inline-block w-8 h-8 bg-gray-200 flex items-center justify-center rounded"><svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg></span>
+                        <span className="text-xs text-gray-700">{photoFile?.name}</span>
+                      </div>
+                    ) : (
+                      <img
+                        src={photoPreview}
+                        alt="Preview"
+                        className="mt-2 w-32 h-32 object-cover rounded-lg border border-gray-200"
+                      />
+                    )
+                  )}
                 </div>
 
                 {/* Back Button */}

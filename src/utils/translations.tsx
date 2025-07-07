@@ -326,6 +326,61 @@ export const translations: {
     de: 'Öffnungszeiten:',
     ar: 'ساعات العمل:'
   },
+  'common.selectDay': {
+    en: 'Select Day',
+    de: 'Tag auswählen',
+    ar: 'اختر اليوم'
+  },
+  'common.selectTime': {
+    en: 'Select Time',
+    de: 'Uhrzeit auswählen',
+    ar: 'اختر الوقت'
+  },
+  'common.sunday': {
+    en: 'Sunday',
+    de: 'Sonntag',
+    ar: 'الأحد'
+  },
+  'common.monday': {
+    en: 'Monday',
+    de: 'Montag',
+    ar: 'الاثنين'
+  },
+  'common.tuesday': {
+    en: 'Tuesday',
+    de: 'Dienstag',
+    ar: 'الثلاثاء'
+  },
+  'common.wednesday': {
+    en: 'Wednesday',
+    de: 'Mittwoch',
+    ar: 'الأربعاء'
+  },
+  'common.thursday': {
+    en: 'Thursday',
+    de: 'Donnerstag',
+    ar: 'الخميس'
+  },
+  'common.friday': {
+    en: 'Friday',
+    de: 'Freitag',
+    ar: 'الجمعة'
+  },
+  'common.saturday': {
+    en: 'Saturday',
+    de: 'Samstag',
+    ar: 'السبت'
+  },
+  'common.bookingSuccess': {
+    en: 'Booking successful!',
+    de: 'Buchung erfolgreich!',
+    ar: 'تم الحجز بنجاح!'
+  },
+  'common.bookingError': {
+    en: 'Please select a day and time.',
+    de: 'Bitte wählen Sie einen Tag und eine Uhrzeit.',
+    ar: 'يرجى اختيار اليوم والوقت.'
+  },
 
   // Features
   'features.verifiedProviders': {
@@ -546,6 +601,26 @@ export const translations: {
     en: 'Reviews',
     de: 'Bewertungen',
     ar: 'المراجعات'
+  },
+  'dashboard.cancel': {
+    en: 'Cancel',
+    de: 'Abbrechen',
+    ar: 'إلغاء'
+  },
+  'dashboard.completedToast': {
+    en: '+10 points for completing an appointment!',
+    ar: '+10 نقاط لإكمال الموعد!',
+    de: '+10 Punkte für einen abgeschlossenen Termin!'
+  },
+  'dashboard.reviewToast': {
+    en: '+5 points for leaving a review!',
+    ar: '+5 نقاط لكتابة تقييم!',
+    de: '+5 Punkte für eine Bewertung!'
+  },
+  'dashboard.receiptToast': {
+    en: '+3 points for uploading a receipt!',
+    ar: '+3 نقاط لتحميل إيصال!',
+    de: '+3 Punkte für das Hochladen eines Belegs!'
   },
 
   // RegisterPage

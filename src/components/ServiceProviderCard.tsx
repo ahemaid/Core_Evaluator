@@ -13,6 +13,9 @@ import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { TimePicker } from '@mui/x-date-pickers/TimePicker';
 import { useState } from 'react';
+import { format, addMinutes, isSameDay, setHours, setMinutes } from 'date-fns';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 interface ServiceProviderCardProps {
   provider: ServiceProvider;
@@ -26,8 +29,31 @@ const ServiceProviderCard: React.FC<ServiceProviderCardProps> = ({ provider, onB
   const [bookingOpen, setBookingOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedTime, setSelectedTime] = useState<Date | null>(null);
+  const [selectedDay, setSelectedDay] = useState<string>('');
+  const [selectedSlot, setSelectedSlot] = useState<string>('');
 
   const isRTL = language === 'ar';
+
+  // Helper: get available days from provider
+  const availableDays = provider.availability || [];
+
+  // Helper: generate time slots for a given day
+  function getTimeSlots(day: string) {
+    const slot = availableDays.find(d => d.day === day);
+    if (!slot) return [];
+    const slots = [];
+    let [startHour, startMinute] = slot.start.split(':').map(Number);
+    let [endHour, endMinute] = slot.end.split(':').map(Number);
+    let current = new Date();
+    current.setHours(startHour, startMinute, 0, 0);
+    const end = new Date();
+    end.setHours(endHour, endMinute, 0, 0);
+    while (current <= end) {
+      slots.push(format(new Date(current), 'HH:mm'));
+      current = addMinutes(new Date(current), 30);
+    }
+    return slots;
+  }
 
   const handleBooking = () => {
     if (user) {
@@ -41,15 +67,34 @@ const ServiceProviderCard: React.FC<ServiceProviderCardProps> = ({ provider, onB
     setBookingOpen(false);
     setSelectedDate(null);
     setSelectedTime(null);
+    setSelectedDay('');
+    setSelectedSlot('');
   };
 
   const handleConfirm = () => {
-    if (selectedDate && selectedTime) {
-      // Merge date and time
-      if (onBook) {
-        onBook(provider.id);
-      }
+    if (selectedDay && selectedSlot && user) {
+      // Create new appointment
+      const newAppointment = {
+        id: Date.now().toString(),
+        userId: user.id,
+        providerId: provider.id,
+        date: selectedDay,
+        time: selectedSlot,
+        status: 'confirmed',
+        notes: '',
+        hasReview: false,
+        hasReceipt: false,
+        serviceType: provider.subcategory,
+      };
+      // Save to localStorage
+      const stored = localStorage.getItem('appointments');
+      const appointments = stored ? JSON.parse(stored) : [];
+      appointments.push(newAppointment);
+      localStorage.setItem('appointments', JSON.stringify(appointments));
+      toast.success(t('common.bookingSuccess') || 'Booking successful!');
       handleClose();
+    } else {
+      toast.error(t('common.bookingError') || 'Please select a day and time.');
     }
   };
 
@@ -90,7 +135,7 @@ const ServiceProviderCard: React.FC<ServiceProviderCardProps> = ({ provider, onB
 
           {/* Provider Info */}
           <div className={`flex-1 min-w-0 ${isRTL ? 'text-right' : 'text-left'}`}>
-            <div className={`flex items-start ${isRTL ? 'justify-start flex-row-reverse' : 'justify-between'}`}>
+            <div className={`flex items-start ${isRTL ? 'justify-start' : 'justify-between'}`}>
               <div className="flex-1">
                 <h3 className="text-lg font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">
                   {provider.name}
@@ -241,32 +286,37 @@ const ServiceProviderCard: React.FC<ServiceProviderCardProps> = ({ provider, onB
           </DialogTitle>
           <DialogContent>
             <div className="flex flex-col gap-4 mt-2" style={{ direction: isRTL ? 'rtl' : 'ltr' }}>
-              <DatePicker
-                label={isRTL ? 'اختر التاريخ' : 'Select Date'}
-                value={selectedDate}
-                onChange={setSelectedDate}
-                slotProps={{ 
-                  textField: { 
-                    fullWidth: true,
-                    InputProps: {
-                      style: { direction: isRTL ? 'rtl' : 'ltr' }
-                    }
-                  } 
+              {/* Day selection */}
+              <label className="font-medium mb-1">{t('common.selectDay')}</label>
+              <select
+                value={selectedDay}
+                onChange={e => {
+                  setSelectedDay(e.target.value);
+                  setSelectedSlot('');
                 }}
-              />
-              <TimePicker
-                label={isRTL ? 'اختر الوقت' : 'Select Time'}
-                value={selectedTime}
-                onChange={setSelectedTime}
-                slotProps={{ 
-                  textField: { 
-                    fullWidth: true,
-                    InputProps: {
-                      style: { direction: isRTL ? 'rtl' : 'ltr' }
-                    }
-                  } 
-                }}
-              />
+                className="p-2 border rounded-lg"
+              >
+                <option value="">{t('common.selectDay')}</option>
+                {availableDays.map(day => (
+                  <option key={day.day} value={day.day}>{t('common.' + day.day.toLowerCase())}</option>
+                ))}
+              </select>
+              {/* Time slot selection */}
+              {selectedDay && (
+                <>
+                  <label className="font-medium mb-1">{t('common.selectTime')}</label>
+                  <select
+                    value={selectedSlot}
+                    onChange={e => setSelectedSlot(e.target.value)}
+                    className="p-2 border rounded-lg"
+                  >
+                    <option value="">{t('common.selectTime')}</option>
+                    {getTimeSlots(selectedDay).map(slot => (
+                      <option key={slot} value={slot}>{slot}</option>
+                    ))}
+                  </select>
+                </>
+              )}
             </div>
           </DialogContent>
           <DialogActions style={{ justifyContent: isRTL ? 'flex-start' : 'flex-end' }}>
@@ -274,8 +324,10 @@ const ServiceProviderCard: React.FC<ServiceProviderCardProps> = ({ provider, onB
               {t('common.cancel') || (isRTL ? 'إلغاء' : 'Cancel')}
             </Button>
             <Button 
-              onClick={handleConfirm} 
-              disabled={!selectedDate || !selectedTime} 
+              onClick={() => {
+                if (selectedDay && selectedSlot) handleConfirm();
+              }} 
+              disabled={!selectedDay || !selectedSlot} 
               variant="contained"
             >
               {t('common.confirm') || (isRTL ? 'تأكيد' : 'Confirm')}
@@ -283,6 +335,7 @@ const ServiceProviderCard: React.FC<ServiceProviderCardProps> = ({ provider, onB
           </DialogActions>
         </Dialog>
       </LocalizationProvider>
+      <ToastContainer position={isRTL ? 'top-left' : 'top-right'} rtl={isRTL} />
     </div>
   );
 };

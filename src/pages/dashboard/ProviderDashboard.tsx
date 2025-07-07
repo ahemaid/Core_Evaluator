@@ -1,34 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTranslation } from '../../utils/translations';
 import { useAuth } from '../../context/AuthContext';
 import { Calendar, User, FileText, Star, Award, CheckCircle, XCircle, Download, CreditCard } from 'lucide-react';
+import { Appointment } from '../../types';
+import { mockAppointments } from '../../data/mockData';
 
 // Mock data for appointments
-const mockAppointments = [
-  {
-    id: '1',
-    customer: 'Ali Hassan',
-    date: '2024-07-01',
-    time: '10:00',
-    status: 'pending',
-  },
-  {
-    id: '2',
-    customer: 'Sara Ahmed',
-    date: '2024-07-02',
-    time: '14:00',
-    status: 'confirmed',
-  },
-  {
-    id: '3',
-    customer: 'Mohamed Salah',
-    date: '2024-07-03',
-    time: '09:30',
-    status: 'completed',
-  },
-];
-
-// Mock evaluation request status
 const mockEvaluatorRequests = [
   {
     id: '1',
@@ -53,6 +30,30 @@ const ProviderDashboard: React.FC = () => {
   const [showReportModal, setShowReportModal] = useState(false);
   const [showEvaluatorModal, setShowEvaluatorModal] = useState(false);
   const [evaluatorRequests, setEvaluatorRequests] = useState(mockEvaluatorRequests);
+  const [appointments, setAppointments] = useState<Appointment[]>(() => {
+    const stored = localStorage.getItem('appointments');
+    if (stored) return JSON.parse(stored);
+    return mockAppointments;
+  });
+
+  useEffect(() => {
+    const handleStorage = () => {
+      const stored = localStorage.getItem('appointments');
+      if (stored) setAppointments(JSON.parse(stored));
+    };
+    window.addEventListener('storage', handleStorage);
+    return () => window.removeEventListener('storage', handleStorage);
+  }, []);
+
+  const providerAppointments = appointments.filter((apt: Appointment) => apt.providerId === user?.id);
+
+  const handleCancel = (id: string) => {
+    const updated = appointments.map((apt: Appointment) =>
+      apt.id === id ? { ...apt, status: 'cancelled' as 'cancelled' } : apt
+    );
+    setAppointments(updated);
+    localStorage.setItem('appointments', JSON.stringify(updated));
+  };
 
   // Simulate requesting a new expert evaluator
   const handleRequestEvaluator = () => {
@@ -110,7 +111,7 @@ const ProviderDashboard: React.FC = () => {
             {/* Requested Appointments Tab */}
             {activeTab === 'appointments' && (
               <div className="space-y-4">
-                {mockAppointments.length === 0 ? (
+                {providerAppointments.length === 0 ? (
                   <p className="text-gray-600 text-center">{t('dashboard.noRequestedAppointments') || 'لا توجد مواعيد مطلوبة.'}</p>
                 ) : (
                   <div className="overflow-x-auto">
@@ -121,18 +122,27 @@ const ProviderDashboard: React.FC = () => {
                           <th className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('dashboard.date') || 'التاريخ'}</th>
                           <th className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('dashboard.time') || 'الوقت'}</th>
                           <th className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('dashboard.status') || 'الحالة'}</th>
+                          <th className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('dashboard.actions') || 'إجراءات'}</th>
                         </tr>
                       </thead>
                       <tbody className="bg-white divide-y divide-gray-100">
-                        {mockAppointments.map(app => (
+                        {providerAppointments.map((app: Appointment) => (
                           <tr key={app.id}>
-                            <td className="px-2 py-2 whitespace-nowrap flex items-center gap-2"><User className="h-4 w-4 text-blue-500" />{app.customer}</td>
+                            <td className="px-2 py-2 whitespace-nowrap flex items-center gap-2"><User className="h-4 w-4 text-blue-500" />{app.userId}</td>
                             <td className="px-2 py-2 whitespace-nowrap">{app.date}</td>
                             <td className="px-2 py-2 whitespace-nowrap">{app.time}</td>
                             <td className="px-2 py-2 whitespace-nowrap">
                               {app.status === 'pending' && <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800"><XCircle className="h-4 w-4 mr-1" />{t('dashboard.pending') || 'قيد الانتظار'}</span>}
                               {app.status === 'confirmed' && <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800"><CheckCircle className="h-4 w-4 mr-1" />{t('dashboard.confirmed') || 'تم التأكيد'}</span>}
                               {app.status === 'completed' && <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800"><CheckCircle className="h-4 w-4 mr-1" />{t('dashboard.completed') || 'مكتمل'}</span>}
+                              {app.status === 'cancelled' && <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800"><XCircle className="h-4 w-4 mr-1" />{t('dashboard.cancelled') || 'ملغي'}</span>}
+                            </td>
+                            <td className="px-2 py-2 whitespace-nowrap">
+                              {(app.status !== 'completed' && app.status !== 'cancelled') && (
+                                <button onClick={() => handleCancel(app.id)} className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 text-xs">
+                                  {t('dashboard.cancel') || 'إلغاء'}
+                                </button>
+                              )}
                             </td>
                           </tr>
                         ))}

@@ -381,6 +381,21 @@ export const translations: {
     de: 'Bitte wählen Sie einen Tag und eine Uhrzeit.',
     ar: 'يرجى اختيار اليوم والوقت.'
   },
+  'common.yes': {
+    en: 'Yes',
+    ar: 'نعم',
+    de: 'Ja'
+  },
+  'common.no': {
+    en: 'No',
+    ar: 'لا',
+    de: 'Nein'
+  },
+  'common.error': {
+    en: 'Please fill all required fields.',
+    ar: 'يرجى تعبئة جميع الحقول المطلوبة.',
+    de: 'Bitte füllen Sie alle Pflichtfelder aus.'
+  },
 
   // Features
   'features.verifiedProviders': {
@@ -1275,6 +1290,301 @@ export const translations: {
     en: 'Admin',
     de: 'Verwaltung',
     ar: 'الإدارة'
+  },
+  'expertApp.title': {
+    en: 'Request to Join as a Secret Evaluator',
+    ar: 'طلب الانضمام كمقيم سري',
+    de: 'Bewerbung als Mystery Evaluator'
+  },
+  'expertApp.intro1': {
+    en: 'Would you like to evaluate stores and commercial establishments in your area? For your services, you will receive compensation (up to ___ and/or a fee of ____ dollars).',
+    ar: 'هل ترغب في تقييم المتاجر والمنشآت التجارية في منطقتك؟ مقابل خدماتك ستحصل على تعويض (حتى ___ و/أو رسوم قدرها ____ دولار).',
+    de: 'Möchten Sie Geschäfte und Betriebe in Ihrer Nähe bewerten? Für Ihre Dienste erhalten Sie eine Vergütung (bis zu ___ und/oder eine Gebühr von ____ Dollar).'
+  },
+  'expertApp.profileTitle': {
+    en: 'Profile:',
+    ar: 'الملف التعريفي:',
+    de: 'Profil:'
+  },
+  'expertApp.profileText': {
+    en: '(Your Company Name) is a customer service quality appraisal company operating across the Kingdom, aiming to provide business owners with a realistic assessment of how customers perceive their stores and services. The evaluator assumes no legal responsibility. The evaluator acts confidentially as an independent contractor, and client names are not disclosed.',
+    ar: '(اسم شركتك) هي شركة تقييم جودة خدمة العملاء تعمل في جميع أنحاء المملكة، وتهدف إلى تزويد أصحاب الأعمال بتقييم واقعي لكيفية رؤية العملاء لمتاجرهم وخدماتهم. لا يتحمل المقيم أي مسؤولية قانونية. يعمل المقيم بشكل سري كمقاول مستقل ولا يتم الكشف عن أسماء العملاء.',
+    de: '(Ihr Firmenname) ist ein Unternehmen für Qualitätsbewertung im Kundenservice, das im gesamten Königreich tätig ist und Geschäftsinhabern eine realistische Einschätzung der Kundenerfahrung bietet. Der Bewerter übernimmt keine rechtliche Verantwortung. Die Bewertung erfolgt vertraulich als unabhängiger Auftragnehmer, Kundennamen werden nicht offengelegt.'
+  },
+  'expertApp.intro2': {
+    en: 'This work requires attention to detail. If you are interested, please fill out the application form below. If not, please share this request with anyone (over 25) who may be interested.',
+    ar: 'يتطلب هذا العمل الانتباه للتفاصيل. إذا كنت مهتمًا، يرجى تعبئة نموذج الطلب أدناه. إذا لم تكن مهتمًا، يرجى مشاركة هذا الطلب مع أي شخص (فوق سن 25) قد يكون مهتمًا.',
+    de: 'Diese Tätigkeit erfordert Aufmerksamkeit für Details. Wenn Sie interessiert sind, füllen Sie bitte das untenstehende Bewerbungsformular aus. Wenn nicht, geben Sie diese Anfrage bitte an jemanden weiter (über 25 Jahre), der interessiert sein könnte.'
+  },
+  'expertApp.thankYou': {
+    en: 'Thank you very much! (Your Name), Chairman (Your Company Name)',
+    ar: 'شكرًا جزيلًا! (اسمك)، رئيس مجلس إدارة (اسم شركتك)',
+    de: 'Vielen Dank! (Ihr Name), Vorsitzender (Ihr Firmenname)'
+  },
+  'expertApp.legalAckTitle': {
+    en: 'Legal Acknowledgment',
+    ar: 'إقرار قانوني',
+    de: 'Rechtliche Bestätigung'
+  },
+  'expertApp.legalAckText': {
+    en: 'I acknowledge that the forms and materials of (Your Company Name) are proprietary and confidential. Any evaluator suspected of sharing these forms with other firms will be subject to legal action to the fullest extent permitted by law.',
+    ar: 'أقر بأن نماذج ومواد (اسم شركتك) ملكية خاصة وسرية. أي مقيم يشتبه في مشاركته هذه النماذج مع شركات تقييم أخرى سيخضع للإجراءات القانونية إلى أقصى حد يسمح به القانون.',
+    de: 'Ich bestätige, dass die Formulare und Materialien von (Ihr Firmenname) urheberrechtlich geschützt und vertraulich sind. Jeder Bewerter, der verdächtigt wird, diese Formulare mit anderen Bewertungsfirmen zu teilen, wird im vollen gesetzlich zulässigen Umfang rechtlich belangt.'
+  },
+  'expertApp.legalAckAgree': {
+    en: 'I agree',
+    ar: 'أوافق',
+    de: 'Ich stimme zu'
+  },
+  'expertApp.signature': {
+    en: 'Signature',
+    ar: 'التوقيع',
+    de: 'Unterschrift'
+  },
+  'expertApp.date': {
+    en: 'Date',
+    ar: 'التاريخ',
+    de: 'Datum'
+  },
+  'expertApp.workedForFirmQ': {
+    en: 'Do you currently work or have you ever worked for a confidential valuation firm as an employee or owner/manager?',
+    ar: 'هل تعمل حاليًا أو سبق لك العمل في شركة تقييم سرية كموظف أو مالك/مدير؟',
+    de: 'Arbeiten Sie derzeit oder haben Sie jemals für eine vertrauliche Bewertungsfirma als Mitarbeiter oder Inhaber/Manager gearbeitet?'
+  },
+  'expertApp.name': {
+    en: 'Your Name',
+    ar: 'اسمك',
+    de: 'Ihr Name'
+  },
+  'expertApp.address': {
+    en: 'Address',
+    ar: 'العنوان',
+    de: 'Adresse'
+  },
+  'expertApp.city': {
+    en: 'City',
+    ar: 'المدينة',
+    de: 'Stadt'
+  },
+  'expertApp.phone': {
+    en: 'Phone Number',
+    ar: 'رقم الهاتف',
+    de: 'Telefonnummer'
+  },
+  'expertApp.email': {
+    en: 'Email Address',
+    ar: 'البريد الإلكتروني',
+    de: 'E-Mail-Adresse'
+  },
+  'expertApp.function': {
+    en: 'Function',
+    ar: 'الوظيفة',
+    de: 'Funktion'
+  },
+  'expertApp.companyActivityQ': {
+    en: 'For employees: What kind of activity does your company operate in?',
+    ar: 'للموظفين: ما نوع النشاط الذي تعمل فيه شركتك؟',
+    de: 'Für Angestellte: In welchem Bereich ist Ihr Unternehmen tätig?'
+  },
+  'expertApp.doneAssessmentQ': {
+    en: 'Have you ever done confidential assessment?',
+    ar: 'هل سبق لك القيام بتقييم سري؟',
+    de: 'Haben Sie jemals eine vertrauliche Bewertung durchgeführt?'
+  },
+  'expertApp.yearsQ': {
+    en: 'Number of years',
+    ar: 'عدد السنوات',
+    de: 'Anzahl der Jahre'
+  },
+  'expertApp.certifiedQ': {
+    en: 'Are you a certified mystery shopper?',
+    ar: 'هل أنت متسوق سري معتمد؟',
+    de: 'Sind Sie ein zertifizierter Mystery Shopper?'
+  },
+  'expertApp.accreditorQ': {
+    en: 'If yes, what is the name of the entity that granted you the accreditation?',
+    ar: 'إذا كانت الإجابة نعم، ما اسم الجهة التي منحتك الاعتماد؟',
+    de: 'Falls ja, wie heißt die akkreditierende Stelle?'
+  },
+  'expertApp.ageGroupQ': {
+    en: 'Age group',
+    ar: 'الفئة العمرية',
+    de: 'Altersgruppe'
+  },
+  'expertApp.ageGroup.18–35': {
+    en: '18–35',
+    ar: '18–35',
+    de: '18–35'
+  },
+  'expertApp.ageGroup.36–50': {
+    en: '36–50',
+    ar: '36–50',
+    de: '36–50'
+  },
+  'expertApp.ageGroup.51–60': {
+    en: '51–60',
+    ar: '51–60',
+    de: '51–60'
+  },
+  'expertApp.ageGroup.Over 61': {
+    en: 'Over 61',
+    ar: 'أكثر من 61',
+    de: 'Über 61'
+  },
+  'expertApp.incomeQ': {
+    en: 'Annual household income',
+    ar: 'الدخل السنوي للأسرة',
+    de: 'Jährliches Haushaltseinkommen'
+  },
+  'expertApp.income.18,000–34,000': {
+    en: '$18,000–34,000',
+    ar: '18,000–34,000 $',
+    de: '18.000–34.000 $'
+  },
+  'expertApp.income.34,000–75,000': {
+    en: '$34,000–75,000',
+    ar: '34,000–75,000 $',
+    de: '34.000–75.000 $'
+  },
+  'expertApp.income.over 75,000': {
+    en: 'Over $75,000',
+    ar: 'أكثر من $75,000 ',
+    de: 'Über 75.000 $'
+  },
+  'expertApp.educationQ': {
+    en: 'Education Level',
+    ar: 'المستوى التعليمي',
+    de: 'Bildungsniveau'
+  },
+  'expertApp.availableDaysQ': {
+    en: 'Please specify the days during which you can perform confidential assessment tasks:',
+    ar: 'يرجى تحديد الأيام التي يمكنك فيها أداء مهام التقييم السري:',
+    de: 'Bitte geben Sie die Tage an, an denen Sie vertrauliche Bewertungsaufgaben übernehmen können:'
+  },
+  'expertApp.motivationQ': {
+    en: 'Please write a few lines about why you want to join our program:',
+    ar: 'يرجى كتابة بعض السطور حول سبب رغبتك في الانضمام إلى برنامجنا:',
+    de: 'Bitte schreiben Sie ein paar Zeilen, warum Sie an unserem Programm teilnehmen möchten:'
+  },
+  'expertApp.submit': {
+    en: 'Submit Application',
+    ar: 'إرسال الطلب',
+    de: 'Bewerbung absenden'
+  },
+  'expertApp.note': {
+    en: 'Note: Any application with unanswered questions will not be considered.',
+    ar: 'ملاحظة: لن يتم النظر في أي طلب لم يتم الإجابة على جميع أسئلته.',
+    de: 'Hinweis: Bewerbungen mit unbeantworteten Fragen werden nicht berücksichtigt.'
+  },
+  'expertApp.submittedTitle': {
+    en: 'Application Submitted',
+    ar: 'تم إرسال الطلب',
+    de: 'Bewerbung eingereicht'
+  },
+  'expertApp.submittedMessage': {
+    en: 'Thank you for your interest! Your application has been sent for review. We will contact you soon.',
+    ar: 'شكرًا لاهتمامك! تم إرسال طلبك للمراجعة وسنتواصل معك قريبًا.',
+    de: 'Vielen Dank für Ihr Interesse! Ihre Bewerbung wurde zur Überprüfung eingereicht. Wir werden Sie in Kürze kontaktieren.'
+  },
+  'expertApp.error.legalAck': {
+    en: 'You must acknowledge the legal statement.',
+    ar: 'يجب الإقرار بالبيان القانوني.',
+    de: 'Sie müssen die rechtliche Erklärung bestätigen.'
+  },
+  'expertApp.error.signatureRequired': {
+    en: 'Signature is required.',
+    ar: 'التوقيع مطلوب.',
+    de: 'Unterschrift erforderlich.'
+  },
+  'expertApp.error.dateRequired': {
+    en: 'Date is required.',
+    ar: 'التاريخ مطلوب.',
+    de: 'Datum erforderlich.'
+  },
+  'expertApp.error.workedForFirm': {
+    en: 'Please answer this question.',
+    ar: 'يرجى الإجابة على هذا السؤال.',
+    de: 'Bitte beantworten Sie diese Frage.'
+  },
+  'expertApp.error.nameRequired': {
+    en: 'Name is required.',
+    ar: 'الاسم مطلوب.',
+    de: 'Name erforderlich.'
+  },
+  'expertApp.error.addressRequired': {
+    en: 'Address is required.',
+    ar: 'العنوان مطلوب.',
+    de: 'Adresse erforderlich.'
+  },
+  'expertApp.error.cityRequired': {
+    en: 'City is required.',
+    ar: 'المدينة مطلوبة.',
+    de: 'Stadt erforderlich.'
+  },
+  'expertApp.error.phoneRequired': {
+    en: 'Phone number is required.',
+    ar: 'رقم الهاتف مطلوب.',
+    de: 'Telefonnummer erforderlich.'
+  },
+  'expertApp.error.emailRequired': {
+    en: 'Email is required.',
+    ar: 'البريد الإلكتروني مطلوب.',
+    de: 'E-Mail erforderlich.'
+  },
+  'expertApp.error.functionRequired': {
+    en: 'Function is required.',
+    ar: 'الوظيفة مطلوبة.',
+    de: 'Funktion erforderlich.'
+  },
+  'expertApp.error.companyActivityRequired': {
+    en: 'Please specify your company activity.',
+    ar: 'يرجى تحديد نشاط شركتك.',
+    de: 'Bitte geben Sie die Tätigkeit Ihres Unternehmens an.'
+  },
+  'expertApp.error.doneAssessment': {
+    en: 'Please answer this question.',
+    ar: 'يرجى الإجابة على هذا السؤال.',
+    de: 'Bitte beantworten Sie diese Frage.'
+  },
+  'expertApp.error.yearsRequired': {
+    en: 'Please specify number of years.',
+    ar: 'يرجى تحديد عدد السنوات.',
+    de: 'Bitte geben Sie die Anzahl der Jahre an.'
+  },
+  'expertApp.error.certified': {
+    en: 'Please answer this question.',
+    ar: 'يرجى الإجابة على هذا السؤال.',
+    de: 'Bitte beantworten Sie diese Frage.'
+  },
+  'expertApp.error.accreditorRequired': {
+    en: 'Please specify accrediting entity.',
+    ar: 'يرجى تحديد جهة الاعتماد.',
+    de: 'Bitte geben Sie die akkreditierende Stelle an.'
+  },
+  'expertApp.error.ageGroupRequired': {
+    en: 'Please select your age group.',
+    ar: 'يرجى اختيار الفئة العمرية.',
+    de: 'Bitte wählen Sie Ihre Altersgruppe aus.'
+  },
+  'expertApp.error.incomeRequired': {
+    en: 'Please select your income.',
+    ar: 'يرجى اختيار الدخل.',
+    de: 'Bitte wählen Sie Ihr Einkommen aus.'
+  },
+  'expertApp.error.educationRequired': {
+    en: 'Please specify your education level.',
+    ar: 'يرجى تحديد المستوى التعليمي.',
+    de: 'Bitte geben Sie Ihr Bildungsniveau an.'
+  },
+  'expertApp.error.availableDaysRequired': {
+    en: 'Please select at least one day.',
+    ar: 'يرجى اختيار يوم واحد على الأقل.',
+    de: 'Bitte wählen Sie mindestens einen Tag aus.'
+  },
+  'expertApp.error.motivationRequired': {
+    en: 'Please write a few lines about your motivation.',
+    ar: 'يرجى كتابة بعض السطور حول سبب رغبتك في الانضمام.',
+    de: 'Bitte schreiben Sie ein paar Zeilen zu Ihrer Motivation.'
   },
 };
 

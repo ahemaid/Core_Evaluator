@@ -11,6 +11,7 @@ import ProviderDashboard from './pages/dashboard/ProviderDashboard';
 import AdminDashboard from './pages/dashboard/AdminDashboard';
 import { LanguageProvider } from './utils/translations';
 import BlogPage from './pages/BlogPage';
+import ExpertEvaluatorApplication from './pages/ExpertEvaluatorApplication';
 
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user, isLoading } = useAuth();
@@ -69,6 +70,7 @@ const AppRoutes: React.FC = () => {
           }
         />
         <Route path="/blog/:id" element={<BlogPage />} />
+        <Route path="/expert-evaluator-application" element={<ExpertEvaluatorApplication />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Layout>

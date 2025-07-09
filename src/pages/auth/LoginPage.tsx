@@ -27,6 +27,8 @@ const LoginPage: React.FC = () => {
         navigate('/provider/dashboard');
       } else if (formData.role === 'admin') {
         navigate('/admin/dashboard');
+      } else if (formData.role === 'evaluator') {
+        navigate('/evaluator/dashboard');
       } else {
         navigate('/dashboard');
       }

@@ -40,7 +40,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1000));
-      
+
+      // Add evaluator login support
+      if (role === 'evaluator' && email === 'evaluator@example.com' && password === 'password123') {
+        const evaluatorUser: User = {
+          id: 'evaluator-1',
+          email,
+          name: 'Expert Evaluator',
+          phone: '+1234567890',
+          role: 'evaluator',
+          rewardPoints: 0,
+          createdAt: new Date().toISOString(),
+          language: 'en',
+        };
+        setUser(evaluatorUser);
+        localStorage.setItem('user', JSON.stringify(evaluatorUser));
+        return true;
+      }
+
       const mockUser: User = {
         id: '1',
         email,
@@ -51,7 +68,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         createdAt: new Date().toISOString(),
         language: 'ar',
       };
-      
+
       setUser(mockUser);
       localStorage.setItem('user', JSON.stringify(mockUser));
       return true;

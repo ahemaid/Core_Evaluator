@@ -9,6 +9,7 @@ import RegisterPage from './pages/auth/RegisterPage';
 import UserDashboard from './pages/dashboard/UserDashboard';
 import ProviderDashboard from './pages/dashboard/ProviderDashboard';
 import AdminDashboard from './pages/dashboard/AdminDashboard';
+import EvaluatorDashboard from './pages/dashboard/EvaluatorDashboard';
 import { LanguageProvider } from './utils/translations';
 import BlogPage from './pages/BlogPage';
 import ExpertEvaluatorApplication from './pages/ExpertEvaluatorApplication';
@@ -64,6 +65,16 @@ const AppRoutes: React.FC = () => {
           element={
             user && user.role === 'admin' ? (
               <AdminDashboard />
+            ) : (
+              <Navigate to="/login" replace />
+            )
+          }
+        />
+        <Route
+          path="/evaluator/dashboard"
+          element={
+            user && user.role === 'evaluator' ? (
+              <EvaluatorDashboard />
             ) : (
               <Navigate to="/login" replace />
             )

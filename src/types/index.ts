@@ -51,6 +51,8 @@ export interface Appointment {
   hasReceipt: boolean;
   serviceType: string;
   receiptUrl?: string;
+  reviewData?: any;
+  overallRating?: number;
 }
 
 export interface Review {

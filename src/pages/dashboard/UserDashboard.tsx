@@ -8,6 +8,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { env } from '../../utils/env';
 import { logApiConfiguration, testApiConnection, testAuthEndpoint } from '../../utils/apiTest';
+import InteractiveReviewModal from '../../components/InteractiveReviewModal';
 
 const UserDashboard: React.FC = () => {
   const { user, updateUser } = useAuth();

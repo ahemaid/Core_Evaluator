@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { User, ServiceProvider } from '../types';
 import { mockProviders } from '../data/mockData';
+import { env } from '../utils/env';
 
 interface AuthContextType {
   user: User | null;
@@ -61,9 +62,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           }
         } else {
           console.log('API login failed with status:', response.status);
+          // If we're in production and API fails, don't fall back to mock
+          if (env.APP_ENV === 'production') {
+            throw new Error('Authentication failed');
+          }
         }
       } catch (apiError) {
         console.log('API login failed, falling back to mock auth:', apiError);
+        // If we're in production and API fails, don't fall back to mock
+        if (env.APP_ENV === 'production') {
+          throw apiError;
+        }
       }
 
       // Fallback to mock authentication for development
@@ -151,7 +160,42 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const register = async (userData: Partial<User>): Promise<boolean> => {
     setIsLoading(true);
     try {
-      // Simulate API call
+      // Try real API registration first
+      try {
+        const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001/api';
+        const response = await fetch(`${API_BASE_URL}/auth/register`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(userData),
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          if (data.success && data.token) {
+            setUser(data.user);
+            localStorage.setItem('user', JSON.stringify(data.user));
+            localStorage.setItem('authToken', data.token);
+            console.log('Real API registration successful');
+            return true;
+          }
+        } else {
+          console.log('API registration failed with status:', response.status);
+          // If we're in production and API fails, don't fall back to mock
+          if (env.APP_ENV === 'production') {
+            throw new Error('Registration failed');
+          }
+        }
+      } catch (apiError) {
+        console.log('API registration failed, falling back to mock:', apiError);
+        // If we're in production and API fails, don't fall back to mock
+        if (env.APP_ENV === 'production') {
+          throw apiError;
+        }
+      }
+
+      // Fallback to mock registration for development
       await new Promise(resolve => setTimeout(resolve, 1000));
       
       const newUser: User = {

@@ -40,7 +40,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       // Try real API login first
       try {
-        const response = await fetch('http://localhost:3001/api/auth/login', {
+        const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001/api';
+        const response = await fetch(`${API_BASE_URL}/auth/login`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -89,7 +90,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       // For mock auth, try to get a real token from the API
       try {
-        const tokenResponse = await fetch('http://localhost:3001/api/auth/login', {
+        const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001/api';
+        const tokenResponse = await fetch(`${API_BASE_URL}/auth/login`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

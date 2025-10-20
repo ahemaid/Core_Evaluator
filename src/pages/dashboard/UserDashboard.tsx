@@ -7,7 +7,7 @@ import { Appointment } from '../../types';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { env } from '../../utils/env';
-import InteractiveReviewModal from '../../components/InteractiveReviewModal';
+import { logApiConfiguration, testApiConnection, testAuthEndpoint } from '../../utils/apiTest';
 
 const UserDashboard: React.FC = () => {
   const { user, updateUser } = useAuth();
@@ -28,12 +28,18 @@ const UserDashboard: React.FC = () => {
   });
 
   useEffect(() => {
-    const handleStorage = () => {
-      const stored = localStorage.getItem('appointments');
-      if (stored) setAppointments(JSON.parse(stored));
-    };
-    window.addEventListener('storage', handleStorage);
-    return () => window.removeEventListener('storage', handleStorage);
+    // Log API configuration for debugging
+    logApiConfiguration();
+    
+    // Test API connection
+    testApiConnection().then(result => {
+      console.log('API Connection Test:', result);
+    });
+    
+    // Test auth endpoint
+    testAuthEndpoint().then(result => {
+      console.log('Auth Endpoint Test:', result);
+    });
   }, []);
 
   const userAppointments = appointments.filter((apt: Appointment) => apt.userId === user?.id);

@@ -6,15 +6,24 @@ import { useTranslation } from '../../utils/translations';
 import { Appointment } from '../../types';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { env } from '../../utils/env';
+import InteractiveReviewModal from '../../components/InteractiveReviewModal';
 
 const UserDashboard: React.FC = () => {
   const { user, updateUser } = useAuth();
   const { t, language } = useTranslation();
   const [activeTab, setActiveTab] = useState('appointments');
+  const [reviewModalOpen, setReviewModalOpen] = useState(false);
+  const [selectedAppointmentForReview, setSelectedAppointmentForReview] = useState<Appointment | null>(null);
 
   const [appointments, setAppointments] = useState<Appointment[]>(() => {
     const stored = localStorage.getItem('appointments');
-    if (stored) return JSON.parse(stored);
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      console.log('Loaded appointments from localStorage:', parsed);
+      return parsed;
+    }
+    console.log('Using mock appointments:', mockAppointments);
     return mockAppointments;
   });
 
@@ -55,29 +64,92 @@ const UserDashboard: React.FC = () => {
     }
   };
 
-  const handleReview = (id: string) => {
+  const handleReview = (appointment: Appointment) => {
+    setSelectedAppointmentForReview(appointment);
+    setReviewModalOpen(true);
+  };
+
+  const handleReviewSubmit = (reviewData: any) => {
+    if (!selectedAppointmentForReview) return;
+    
+    console.log('Submitting review data:', reviewData);
+    console.log('For appointment:', selectedAppointmentForReview);
+    
+    // Update appointment with review data
     const updated = appointments.map((apt: Appointment) =>
-      apt.id === id ? { ...apt, hasReview: true } : apt
+      apt.id === selectedAppointmentForReview.id
+        ? { 
+            ...apt, 
+            hasReview: true, 
+            reviewData: reviewData,
+            overallRating: reviewData.overallSatisfaction
+          }
+        : apt
     );
     setAppointments(updated);
     localStorage.setItem('appointments', JSON.stringify(updated));
+    
+    console.log('Updated appointments:', updated);
+    
     if (user) {
       updateUser({ rewardPoints: user.rewardPoints + 5 });
-      toast.success(t('dashboard.reviewToast') || '+5 points for leaving a review!');
     }
+    
+    toast.success(t('dashboard.reviewToast') || '+5 points for leaving a detailed review!');
+    setReviewModalOpen(false);
+    setSelectedAppointmentForReview(null);
   };
 
   const handleReceiptUpload = async (file: File, appointmentId: string) => {
+    // Validate file type
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'application/pdf'];
+    if (!allowedTypes.includes(file.type)) {
+      toast.error('Invalid file type. Please upload an image (JPEG, PNG, WebP) or PDF file.');
+      return;
+    }
+
+    // Validate file size (5MB limit)
+    const maxSize = 5 * 1024 * 1024; // 5MB
+    if (file.size > maxSize) {
+      toast.error('File size too large. Please upload a file smaller than 5MB.');
+      return;
+    }
+
     const formData = new FormData();
     formData.append('receipt', file);
     formData.append('appointmentId', appointmentId);
+    
+    // Get auth token
+    const token = localStorage.getItem('authToken');
+    
+    if (!token) {
+      toast.error('Please log in to upload receipts.');
+      return;
+    }
+    
     try {
-      const response = await fetch('http://localhost:4000/upload-receipt', {
+      console.log('Uploading receipt to:', env.UPLOAD_RECEIPT_URL);
+      console.log('File details:', { name: file.name, size: file.size, type: file.type });
+      
+      const response = await fetch(env.UPLOAD_RECEIPT_URL, {
         method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
         body: formData,
       });
-      if (!response.ok) throw new Error('Upload failed');
+      
+      console.log('Upload response status:', response.status);
+      
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ error: 'Upload failed' }));
+        console.error('Upload error:', errorData);
+        throw new Error(errorData.error || errorData.message || 'Upload failed');
+      }
+      
       const data = await response.json();
+      console.log('Upload success:', data);
+      
       // Update appointment with receiptUrl and hasReceipt
       const updated = appointments.map((apt: Appointment) =>
         apt.id === appointmentId
@@ -86,12 +158,16 @@ const UserDashboard: React.FC = () => {
       );
       setAppointments(updated);
       localStorage.setItem('appointments', JSON.stringify(updated));
+      
       if (user) {
         updateUser({ rewardPoints: user.rewardPoints + 3 });
       }
+      
       toast.success(t('dashboard.receiptToast') || '+3 points for uploading a receipt!');
     } catch (err) {
-      toast.error('Failed to upload receipt');
+      console.error('Receipt upload error:', err);
+      const errorMessage = err instanceof Error ? err.message : 'Failed to upload receipt';
+      toast.error(`Failed to upload receipt: ${errorMessage}`);
     }
   };
 
@@ -262,7 +338,7 @@ const UserDashboard: React.FC = () => {
                               </div>
                               <div className="flex items-center space-x-3">
                                 {!appointment.hasReview && (
-                                  <button onClick={() => handleReview(appointment.id)} className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700 transition-colors">
+                                  <button onClick={() => handleReview(appointment)} className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700 transition-colors">
                                     {t('dashboard.leaveReview')}
                                   </button>
                                 )}
@@ -284,7 +360,7 @@ const UserDashboard: React.FC = () => {
                                 )}
                                 {appointment.receiptUrl && (
                                   <a
-                                    href={`http://localhost:4000${appointment.receiptUrl}`}
+                                    href={`http://localhost:3001${appointment.receiptUrl}`}
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     className="ml-2 text-blue-600 underline text-xs"
@@ -312,11 +388,104 @@ const UserDashboard: React.FC = () => {
             {activeTab === 'reviews' && (
               <div>
                 <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('dashboard.myReviews')}</h3>
-                <div className="text-center py-8">
-                  <Star className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                  <p className="text-gray-600">{t('dashboard.noReviewsYet')}</p>
-                  <p className="text-sm text-gray-500 mt-1">{t('dashboard.completeAppointmentsToReview')}</p>
-                </div>
+                {(() => {
+                  const reviewsWithData = appointments.filter(apt => apt.hasReview && apt.reviewData);
+                  
+                  if (reviewsWithData.length === 0) {
+                    return (
+                      <div className="text-center py-8">
+                        <Star className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                        <p className="text-gray-600">{t('dashboard.noReviewsYet')}</p>
+                        <p className="text-sm text-gray-500 mt-1">{t('dashboard.completeAppointmentsToReview')}</p>
+                      </div>
+                    );
+                  }
+                  
+                  return (
+                    <div className="space-y-4">
+                      {reviewsWithData.map((appointment) => {
+                        const provider = getProviderById(appointment.providerId);
+                        const reviewData = appointment.reviewData;
+                        
+                        return (
+                          <div key={appointment.id} className="bg-white border border-gray-200 rounded-lg p-6">
+                            <div className="flex items-start justify-between mb-4">
+                              <div className="flex items-center space-x-4">
+                                <img
+                                  src={provider?.photo}
+                                  alt={provider?.name}
+                                  className="w-12 h-12 rounded-lg object-cover"
+                                />
+                                <div>
+                                  <h4 className="font-semibold text-gray-900">{provider?.name}</h4>
+                                  <p className="text-gray-600">{provider?.subcategory}</p>
+                                  <p className="text-sm text-gray-500">{appointment.date} at {appointment.time}</p>
+                                </div>
+                              </div>
+                              <div className="flex items-center space-x-1">
+                                {[...Array(5)].map((_, i) => (
+                                  <Star
+                                    key={i}
+                                    className={`w-5 h-5 ${
+                                      i < (reviewData.overallSatisfaction || 0)
+                                        ? 'text-yellow-400 fill-current'
+                                        : 'text-gray-300'
+                                    }`}
+                                  />
+                                ))}
+                                <span className="ml-2 text-sm font-medium text-gray-700">
+                                  {reviewData.overallSatisfaction}/5
+                                </span>
+                              </div>
+                            </div>
+                            
+                            {/* Review Summary */}
+                            <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-4">
+                              <div className="text-center p-3 bg-blue-50 rounded-lg">
+                                <div className="text-lg font-bold text-blue-600">
+                                  {reviewData.listenedCarefully || 0}
+                                </div>
+                                <div className="text-xs text-blue-700">Communication</div>
+                              </div>
+                              <div className="text-center p-3 bg-green-50 rounded-lg">
+                                <div className="text-lg font-bold text-green-600">
+                                  {reviewData.easyScheduling || 0}
+                                </div>
+                                <div className="text-xs text-green-700">Timeliness</div>
+                              </div>
+                              <div className="text-center p-3 bg-purple-50 rounded-lg">
+                                <div className="text-lg font-bold text-purple-600">
+                                  {reviewData.courtesy || 0}
+                                </div>
+                                <div className="text-xs text-purple-700">Professionalism</div>
+                              </div>
+                            </div>
+                            
+                            {/* Recommendations */}
+                            <div className="flex items-center space-x-2 mb-3">
+                              <span className="text-sm font-medium text-gray-700">Would Recommend:</span>
+                              <div className={`px-2 py-1 rounded-full text-xs font-medium ${
+                                reviewData.wouldRecommend
+                                  ? 'bg-green-100 text-green-700'
+                                  : 'bg-red-100 text-red-700'
+                              }`}>
+                                {reviewData.wouldRecommend ? 'Yes' : 'No'}
+                              </div>
+                            </div>
+                            
+                            {/* Improvement Suggestions */}
+                            {reviewData.improvementSuggestions && (
+                              <div className="mt-3 p-3 bg-gray-50 rounded-lg">
+                                <h5 className="text-sm font-medium text-gray-700 mb-2">Improvement Suggestions:</h5>
+                                <p className="text-sm text-gray-600">{reviewData.improvementSuggestions}</p>
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  );
+                })()}
               </div>
             )}
 
@@ -356,6 +525,17 @@ const UserDashboard: React.FC = () => {
           </div>
         </div>
       </div>
+      
+      {/* Interactive Review Modal */}
+      <InteractiveReviewModal
+        open={reviewModalOpen}
+        onClose={() => {
+          setReviewModalOpen(false);
+          setSelectedAppointmentForReview(null);
+        }}
+        onSubmit={handleReviewSubmit}
+        providerName={selectedAppointmentForReview ? getProviderById(selectedAppointmentForReview.providerId)?.name || 'Provider' : ''}
+      />
     </div>
   );
 };

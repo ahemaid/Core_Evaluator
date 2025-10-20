@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from '../../utils/translations';
 import { useAuth } from '../../context/AuthContext';
-import { Calendar, User, FileText, Star, Award, CheckCircle, XCircle, Download, CreditCard } from 'lucide-react';
+import { Calendar, User, FileText, Star, Award, CheckCircle, XCircle, Download, CreditCard, Settings, BarChart3, MessageSquare, Video, Clock, TrendingUp } from 'lucide-react';
 import { Appointment } from '../../types';
 import { mockAppointments } from '../../data/mockData';
+import ProviderProfileManagement from '../../components/ProviderProfileManagement';
+import ProviderAppointmentManagement from '../../components/ProviderAppointmentManagement';
+import ProviderAnalytics from '../../components/ProviderAnalytics';
 
 // Mock data for appointments
 const mockEvaluatorRequests = [
@@ -26,7 +29,7 @@ const mockEvaluatorRequests = [
 const ProviderDashboard: React.FC = () => {
   const { t, language } = useTranslation();
   const { user } = useAuth();
-  const [activeTab, setActiveTab] = useState('appointments');
+  const [activeTab, setActiveTab] = useState('dashboard');
   const [showReportModal, setShowReportModal] = useState(false);
   const [showEvaluatorModal, setShowEvaluatorModal] = useState(false);
   const [evaluatorRequests, setEvaluatorRequests] = useState(mockEvaluatorRequests);
@@ -72,44 +75,213 @@ const ProviderDashboard: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50" dir={language === 'ar' ? 'rtl' : 'ltr'}>
-      <div className="max-w-5xl mx-auto px-2 sm:px-6 lg:px-8 py-8">
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 sm:p-6 mb-8">
-          <h1 className="text-2xl font-bold text-gray-900 mb-2 flex items-center gap-2">
-            <Award className="h-6 w-6 text-yellow-500" />
-            {t('dashboard.providerDashboard') || 'لوحة تحكم مقدم الخدمة'}
+      <div className="max-w-7xl mx-auto px-2 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-3 sm:p-4 md:p-6 mb-6 sm:mb-8">
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2 flex items-center gap-2">
+            <Award className="h-5 w-5 sm:h-6 sm:w-6 text-yellow-500" />
+            <span className="truncate">{t('dashboard.providerDashboard') || 'لوحة تحكم مقدم الخدمة'}</span>
           </h1>
-          <p className="text-gray-600 text-sm">{t('dashboard.providerWelcome') || 'إدارة المواعيد والتقارير والتقييمات الاحترافية'}</p>
+          <p className="text-gray-600 text-xs sm:text-sm">{t('dashboard.providerWelcome') || 'إدارة المواعيد والتقارير والتقييمات الاحترافية'}</p>
         </div>
 
         {/* Tabs */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 mb-8">
-          <nav className={language === 'ar' ? 'flex gap-x-4 md:gap-x-6 px-2 sm:px-6' : 'flex space-x-4 md:space-x-8 px-2 sm:px-6 min-w-max border-b border-gray-100 overflow-x-auto'}>
-            <button
-              onClick={() => setActiveTab('appointments')}
-              className={`flex items-center space-x-1 sm:space-x-2 py-2 sm:py-4 border-b-2 transition-colors text-sm sm:text-base ${activeTab === 'appointments' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-600 hover:text-gray-900'}`}
-            >
-              <Calendar className="h-5 w-5" />
-              <span>{t('dashboard.requestedAppointments') || 'المواعيد المطلوبة'}</span>
-            </button>
-            <button
-              onClick={() => setActiveTab('ratingReport')}
-              className={`flex items-center space-x-1 sm:space-x-2 py-2 sm:py-4 border-b-2 transition-colors text-sm sm:text-base ${activeTab === 'ratingReport' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-600 hover:text-gray-900'}`}
-            >
-              <FileText className="h-5 w-5" />
-              <span>{t('dashboard.personalRatingReport') || 'تقرير التقييم الشخصي'}</span>
-            </button>
-            <button
-              onClick={() => setActiveTab('expertEvaluator')}
-              className={`flex items-center space-x-1 sm:space-x-2 py-2 sm:py-4 border-b-2 transition-colors text-sm sm:text-base ${activeTab === 'expertEvaluator' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-600 hover:text-gray-900'}`}
-            >
-              <Star className="h-5 w-5" />
-              <span>{t('dashboard.paidExpertEvaluator') || 'طلب تقييم خبير مدفوع'}</span>
-            </button>
+          {/* Desktop Navigation */}
+          <nav className="hidden sm:block border-b border-gray-100">
+            <div className="flex space-x-4 md:space-x-8 px-2 sm:px-6 overflow-x-auto">
+              <div className="min-w-max flex space-x-4 md:space-x-6 lg:space-x-8">
+                <button
+                  onClick={() => setActiveTab('dashboard')}
+                  className={`flex items-center space-x-1 sm:space-x-2 py-2 sm:py-4 px-2 sm:px-3 border-b-2 transition-colors text-xs sm:text-sm md:text-base ${activeTab === 'dashboard' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-600 hover:text-gray-900'}`}
+                >
+                  <BarChart3 className="h-4 w-4 sm:h-5 sm:w-5" />
+                  <span className="hidden sm:inline">{t('dashboard.dashboard')}</span>
+                  <span className="sm:hidden">{t('dashboard.dashboard')}</span>
+                </button>
+                <button
+                  onClick={() => setActiveTab('appointments')}
+                  className={`flex items-center space-x-1 sm:space-x-2 py-2 sm:py-4 px-2 sm:px-3 border-b-2 transition-colors text-xs sm:text-sm md:text-base ${activeTab === 'appointments' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-600 hover:text-gray-900'}`}
+                >
+                  <Calendar className="h-4 w-4 sm:h-5 sm:w-5" />
+                  <span className="hidden md:inline">{t('dashboard.requestedAppointments')}</span>
+                  <span className="hidden sm:inline md:hidden">{t('dashboard.appointments')}</span>
+                  <span className="sm:hidden">{t('dashboard.appointmentsShort')}</span>
+                </button>
+                <button
+                  onClick={() => setActiveTab('profile')}
+                  className={`flex items-center space-x-1 sm:space-x-2 py-2 sm:py-4 px-2 sm:px-3 border-b-2 transition-colors text-xs sm:text-sm md:text-base ${activeTab === 'profile' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-600 hover:text-gray-900'}`}
+                >
+                  <Settings className="h-4 w-4 sm:h-5 sm:w-5" />
+                  <span className="hidden md:inline">{t('dashboard.profile')}</span>
+                  <span className="hidden sm:inline md:hidden">{t('dashboard.profile')}</span>
+                  <span className="sm:hidden">{t('dashboard.profile')}</span>
+                </button>
+                <button
+                  onClick={() => setActiveTab('analytics')}
+                  className={`flex items-center space-x-1 sm:space-x-2 py-2 sm:py-4 px-2 sm:px-3 border-b-2 transition-colors text-xs sm:text-sm md:text-base ${activeTab === 'analytics' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-600 hover:text-gray-900'}`}
+                >
+                  <TrendingUp className="h-4 w-4 sm:h-5 sm:w-5" />
+                  <span className="hidden md:inline">{t('dashboard.analytics')}</span>
+                  <span className="hidden sm:inline md:hidden">{t('dashboard.analytics')}</span>
+                  <span className="sm:hidden">{t('dashboard.analytics')}</span>
+                </button>
+                <button
+                  onClick={() => setActiveTab('ratingReport')}
+                  className={`flex items-center space-x-1 sm:space-x-2 py-2 sm:py-4 px-2 sm:px-3 border-b-2 transition-colors text-xs sm:text-sm md:text-base ${activeTab === 'ratingReport' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-600 hover:text-gray-900'}`}
+                >
+                  <FileText className="h-4 w-4 sm:h-5 sm:w-5" />
+                  <span className="hidden lg:inline">{t('dashboard.personalRatingReport')}</span>
+                  <span className="hidden md:inline lg:hidden">{t('dashboard.ratingReport')}</span>
+                  <span className="hidden sm:inline md:hidden">{t('dashboard.reports')}</span>
+                  <span className="sm:hidden">{t('dashboard.reports')}</span>
+                </button>
+                <button
+                  onClick={() => setActiveTab('expertEvaluator')}
+                  className={`flex items-center space-x-1 sm:space-x-2 py-2 sm:py-4 px-2 sm:px-3 border-b-2 transition-colors text-xs sm:text-sm md:text-base ${activeTab === 'expertEvaluator' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-600 hover:text-gray-900'}`}
+                >
+                  <Star className="h-4 w-4 sm:h-5 sm:w-5" />
+                  <span className="hidden lg:inline">{t('dashboard.paidExpertEvaluator')}</span>
+                  <span className="hidden md:inline lg:hidden">{t('dashboard.expertEvaluator')}</span>
+                  <span className="hidden sm:inline md:hidden">{t('dashboard.evaluator')}</span>
+                  <span className="sm:hidden">{t('dashboard.expert')}</span>
+                </button>
+              </div>
+            </div>
           </nav>
 
-          <div className="p-2 sm:p-6">
-            {/* Requested Appointments Tab */}
+          {/* Mobile Navigation Dropdown */}
+          <div className="sm:hidden px-4 py-3 border-b border-gray-100">
+            <select
+              value={activeTab}
+              onChange={(e) => setActiveTab(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+            >
+              <option value="dashboard">📊 {t('dashboard.dashboard')}</option>
+              <option value="appointments">📅 {t('dashboard.appointments')}</option>
+              <option value="profile">⚙️ {t('dashboard.profile')}</option>
+              <option value="analytics">📈 {t('dashboard.analytics')}</option>
+              <option value="ratingReport">📄 {t('dashboard.ratingReport')}</option>
+              <option value="expertEvaluator">⭐ {t('dashboard.expertEvaluator')}</option>
+            </select>
+          </div>
+
+          <div className="p-3 sm:p-4 md:p-6">
+            {/* Dashboard Overview Tab */}
+            {activeTab === 'dashboard' && (
+              <div className="space-y-6">
+                {/* Quick Stats */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+                  <div className="bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg p-4 sm:p-6 text-white">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-blue-100 text-xs sm:text-sm">{t('dashboard.totalAppointments')}</p>
+                        <p className="text-xl sm:text-2xl font-bold">{providerAppointments.length}</p>
+                      </div>
+                      <Calendar className="h-6 w-6 sm:h-8 sm:w-8 text-blue-200" />
+                    </div>
+                  </div>
+                  
+                  <div className="bg-gradient-to-r from-green-500 to-green-600 rounded-lg p-4 sm:p-6 text-white">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-green-100 text-xs sm:text-sm">{t('dashboard.completed')}</p>
+                        <p className="text-xl sm:text-2xl font-bold">{providerAppointments.filter(a => a.status === 'completed').length}</p>
+                      </div>
+                      <CheckCircle className="h-6 w-6 sm:h-8 sm:w-8 text-green-200" />
+                    </div>
+                  </div>
+                  
+                  <div className="bg-gradient-to-r from-yellow-500 to-yellow-600 rounded-lg p-4 sm:p-6 text-white">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-yellow-100 text-xs sm:text-sm">{t('dashboard.pending')}</p>
+                        <p className="text-xl sm:text-2xl font-bold">{providerAppointments.filter(a => a.status === 'pending').length}</p>
+                      </div>
+                      <Clock className="h-6 w-6 sm:h-8 sm:w-8 text-yellow-200" />
+                    </div>
+                  </div>
+                  
+                  <div className="bg-gradient-to-r from-purple-500 to-purple-600 rounded-lg p-4 sm:p-6 text-white">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-purple-100 text-xs sm:text-sm">{t('dashboard.rating')}</p>
+                        <p className="text-xl sm:text-2xl font-bold">4.8</p>
+                      </div>
+                      <Star className="h-6 w-6 sm:h-8 sm:w-8 text-purple-200" />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Recent Activity */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('dashboard.recentAppointments')}</h3>
+                    <div className="space-y-3">
+                      {providerAppointments.slice(0, 5).map((app) => (
+                        <div key={app.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                          <div>
+                            <p className="text-sm font-medium text-gray-900">{app.userId}</p>
+                            <p className="text-xs text-gray-500">{app.date} at {app.time}</p>
+                          </div>
+                          <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                            app.status === 'completed' ? 'bg-green-100 text-green-800' :
+                            app.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+                            'bg-red-100 text-red-800'
+                          }`}>
+                            {app.status}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('dashboard.quickActions')}</h3>
+                    <div className="space-y-3">
+                      <button
+                        onClick={() => setActiveTab('appointments')}
+                        className="w-full flex items-center gap-3 p-3 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors"
+                      >
+                        <Calendar className="h-5 w-5 text-blue-600" />
+                        <span className="text-sm font-medium text-blue-900">{t('dashboard.manageAppointments')}</span>
+                      </button>
+                      <button
+                        onClick={() => setActiveTab('profile')}
+                        className="w-full flex items-center gap-3 p-3 bg-green-50 rounded-lg hover:bg-green-100 transition-colors"
+                      >
+                        <Settings className="h-5 w-5 text-green-600" />
+                        <span className="text-sm font-medium text-green-900">{t('dashboard.updateProfile')}</span>
+                      </button>
+                      <button
+                        onClick={() => setActiveTab('analytics')}
+                        className="w-full flex items-center gap-3 p-3 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors"
+                      >
+                        <TrendingUp className="h-5 w-5 text-purple-600" />
+                        <span className="text-sm font-medium text-purple-900">{t('dashboard.viewAnalytics')}</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Enhanced Appointments Tab */}
             {activeTab === 'appointments' && (
+              <ProviderAppointmentManagement />
+            )}
+
+            {/* Profile Management Tab */}
+            {activeTab === 'profile' && (
+              <ProviderProfileManagement />
+            )}
+
+            {/* Analytics Tab */}
+            {activeTab === 'analytics' && (
+              <ProviderAnalytics />
+            )}
+
+            {/* Legacy Appointments Tab (Fallback) */}
+            {activeTab === 'legacy-appointments' && (
               <div className="space-y-4">
                 {providerAppointments.length === 0 ? (
                   <p className="text-gray-600 text-center">{t('dashboard.noRequestedAppointments') || 'لا توجد مواعيد مطلوبة.'}</p>

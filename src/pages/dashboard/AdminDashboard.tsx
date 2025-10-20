@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from '../../utils/translations';
 import { User } from '../../types';
-import { User as UserIcon, Award, AlertTriangle, CheckCircle, XCircle, Star, ClipboardList, Plus, Trash2, Calendar } from 'lucide-react';
+import { User as UserIcon, Award, AlertTriangle, CheckCircle, XCircle, Star, ClipboardList, Plus, Trash2, Calendar, MessageSquare, Bell, BarChart3, Shield, Users, FileText, Settings, ChevronDown } from 'lucide-react';
 import { blogs as initialBlogs, BlogPost } from '../../data/blogs';
 import { mockProviders, mockAppointments } from '../../data/mockData';
 import { ServiceProvider, Appointment } from '../../types';
@@ -11,6 +11,8 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogActions from '@mui/material/DialogActions';
 import Button from '@mui/material/Button';
 import { useAuth } from '../../context/AuthContext';
+import QualityMetrics from '../../components/QualityMetrics';
+import MessageSystem from '../../components/MessageSystem';
 
 // Mock data
 const mockUsers = [
@@ -151,7 +153,7 @@ const ExpertApplicationsTable: React.FC = () => {
                     <div><b>Education:</b> {app.education}</div>
                     <div><b>Available Days:</b> {app.availableDays.join(', ')}</div>
                     <div><b>Motivation:</b> {app.motivation}</div>
-                    <div><b>Legal Ack:</b> {app.legalAck ? 'Yes' : 'No'}</div>
+                    <div><b>Legal Ack:</b> {app.legalAck ? t('admin.yes') : t('admin.no')}</div>
                     <div><b>Date:</b> {app.date}</div>
                   </div>
                 </details>
@@ -272,77 +274,142 @@ const AdminDashboard: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50" dir={language === 'ar' ? 'rtl' : 'ltr'}>
-      <div className="max-w-6xl mx-auto px-2 sm:px-6 lg:px-8 py-8">
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 sm:p-6 mb-8">
-          <h1 className="text-2xl font-bold text-gray-900 mb-2 flex items-center gap-2">
-            <ClipboardList className="h-6 w-6 text-blue-500" />
-            {t('admin.dashboardTitle') || 'لوحة تحكم المشرف'}
+      <div className="max-w-7xl mx-auto px-2 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 sm:p-6 mb-6 sm:mb-8">
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2 flex items-center gap-2">
+            <ClipboardList className="h-5 w-5 sm:h-6 sm:w-6 text-blue-500" />
+            <span className="truncate">{t('admin.dashboardTitle') || 'لوحة تحكم المشرف'}</span>
           </h1>
-          <p className="text-gray-600 text-sm">{t('admin.dashboardDesc') || 'إدارة النظام الداخلي وجودة الخدمة.'}</p>
+          <p className="text-gray-600 text-xs sm:text-sm">{t('admin.dashboardDesc') || 'إدارة النظام الداخلي وجودة الخدمة.'}</p>
         </div>
 
         {/* Tabs */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 mb-8">
-          <nav className={language === 'ar' ? 'flex gap-x-4 md:gap-x-6 px-2 sm:px-6' : 'flex space-x-4 md:space-x-8 px-2 sm:px-6 min-w-max border-b border-gray-100 overflow-x-auto'}>
-            <button
-              onClick={() => setActiveTab('overview')}
-              className={`flex items-center space-x-1 sm:space-x-2 py-2 sm:py-4 border-b-2 transition-colors text-sm sm:text-base ${activeTab === 'overview' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-600 hover:text-gray-900'}`}
+          {/* Mobile Dropdown Navigation */}
+          <div className="block sm:hidden p-4 border-b border-gray-100">
+            <select
+              value={activeTab}
+              onChange={(e) => setActiveTab(e.target.value)}
+              className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
             >
-              <Award className="h-5 w-5" />
-              <span>{t('admin.overview') || 'نظرة عامة'}</span>
-            </button>
-            <button
-              onClick={() => setActiveTab('management')}
-              className={`flex items-center space-x-1 sm:space-x-2 py-2 sm:py-4 border-b-2 transition-colors text-sm sm:text-base ${activeTab === 'management' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-600 hover:text-gray-900'}`}
-            >
-              <UserIcon className="h-5 w-5" />
-              <span>{t('admin.doctorUserManagement') || 'إدارة الأطباء والمستخدمين'}</span>
-            </button>
-            <button
-              onClick={() => setActiveTab('ratings')}
-              className={`flex items-center space-x-1 sm:space-x-2 py-2 sm:py-4 border-b-2 transition-colors text-sm sm:text-base ${activeTab === 'ratings' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-600 hover:text-gray-900'}`}
-            >
-              <Star className="h-5 w-5" />
-              <span>{t('admin.ratingMonitoring') || 'مراقبة التقييمات'}</span>
-            </button>
-            <button
-              onClick={() => setActiveTab('evaluatorRequests')}
-              className={`flex items-center space-x-1 sm:space-x-2 py-2 sm:py-4 border-b-2 transition-colors text-sm sm:text-base ${activeTab === 'evaluatorRequests' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-600 hover:text-gray-900'}`}
-            >
-              <AlertTriangle className="h-5 w-5" />
-              <span>{t('admin.evaluatorRequests') || 'طلبات التقييم'}</span>
-            </button>
-            <button
-              onClick={() => setActiveTab('blog')}
-              className={`flex items-center space-x-1 sm:space-x-2 py-2 sm:py-4 border-b-2 transition-colors text-sm sm:text-base ${activeTab === 'blog' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-600 hover:text-gray-900'}`}
-            >
-              <Star className="h-5 w-5" />
-              <span>{t('admin.blogManagement') || 'إدارة المدونة'}</span>
-            </button>
-            <button
-              onClick={() => setActiveTab('auditLogs')}
-              className={`flex items-center space-x-1 sm:space-x-2 py-2 sm:py-4 border-b-2 transition-colors text-sm sm:text-base ${activeTab === 'auditLogs' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-600 hover:text-gray-900'}`}
-            >
-              <ClipboardList className="h-5 w-5" />
-              <span>Audit Logs</span>
-            </button>
-            <button
-              onClick={() => setActiveTab('appointments')}
-              className={`flex items-center space-x-1 sm:space-x-2 py-2 sm:py-4 border-b-2 transition-colors text-sm sm:text-base ${activeTab === 'appointments' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-600 hover:text-gray-900'}`}
-            >
-              <Calendar className="h-5 w-5" />
-              <span>{t('admin.appointments') || 'المواعيد'}</span>
-            </button>
-            <button
-              onClick={() => setActiveTab('expertApplications')}
-              className={`flex items-center space-x-1 sm:space-x-2 py-2 sm:py-4 border-b-2 transition-colors text-sm sm:text-base ${activeTab === 'expertApplications' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-600 hover:text-gray-900'}`}
-            >
-              <ClipboardList className="h-5 w-5" />
-              <span>Expert Applications</span>
-            </button>
+              <option value="overview">Overview</option>
+              <option value="management">Management</option>
+              <option value="ratings">Ratings</option>
+              <option value="evaluatorRequests">Evaluator</option>
+              <option value="blog">Blog</option>
+              <option value="auditLogs">Audit</option>
+              <option value="appointments">Appointments</option>
+              <option value="expertApplications">Expert</option>
+              <option value="quality">Quality</option>
+              <option value="messages">Chat</option>
+              <option value="notifications">Alerts</option>
+              <option value="security">Security</option>
+            </select>
+          </div>
+
+          {/* Desktop Navigation */}
+          <nav className="hidden sm:block border-b border-gray-100 overflow-x-auto">
+            <div className="flex space-x-1 sm:space-x-2 md:space-x-4 lg:space-x-6 px-2 sm:px-4 md:px-6 min-w-max">
+              <button
+                onClick={() => setActiveTab('overview')}
+                className={`flex items-center space-x-1 sm:space-x-2 py-2 sm:py-3 md:py-4 border-b-2 transition-colors text-xs sm:text-sm md:text-base whitespace-nowrap ${activeTab === 'overview' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-600 hover:text-gray-900'}`}
+              >
+                <Award className="h-4 w-4 sm:h-5 sm:w-5" />
+                <span className="hidden sm:inline">{t('admin.overview') || 'نظرة عامة'}</span>
+                <span className="sm:hidden">Overview</span>
+              </button>
+              <button
+                onClick={() => setActiveTab('management')}
+                className={`flex items-center space-x-1 sm:space-x-2 py-2 sm:py-3 md:py-4 border-b-2 transition-colors text-xs sm:text-sm md:text-base whitespace-nowrap ${activeTab === 'management' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-600 hover:text-gray-900'}`}
+              >
+                <UserIcon className="h-4 w-4 sm:h-5 sm:w-5" />
+                <span className="hidden md:inline">{t('admin.doctorUserManagement') || 'إدارة الأطباء والمستخدمين'}</span>
+                <span className="md:hidden">Management</span>
+              </button>
+              <button
+                onClick={() => setActiveTab('ratings')}
+                className={`flex items-center space-x-1 sm:space-x-2 py-2 sm:py-3 md:py-4 border-b-2 transition-colors text-xs sm:text-sm md:text-base whitespace-nowrap ${activeTab === 'ratings' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-600 hover:text-gray-900'}`}
+              >
+                <Star className="h-4 w-4 sm:h-5 sm:w-5" />
+                <span className="hidden md:inline">{t('admin.ratingMonitoring') || 'مراقبة التقييمات'}</span>
+                <span className="md:hidden">Ratings</span>
+              </button>
+              <button
+                onClick={() => setActiveTab('evaluatorRequests')}
+                className={`flex items-center space-x-1 sm:space-x-2 py-2 sm:py-3 md:py-4 border-b-2 transition-colors text-xs sm:text-sm md:text-base whitespace-nowrap ${activeTab === 'evaluatorRequests' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-600 hover:text-gray-900'}`}
+              >
+                <AlertTriangle className="h-4 w-4 sm:h-5 sm:w-5" />
+                <span className="hidden lg:inline">{t('admin.evaluatorRequests') || 'طلبات التقييم'}</span>
+                <span className="lg:hidden">Evaluator</span>
+              </button>
+              <button
+                onClick={() => setActiveTab('blog')}
+                className={`flex items-center space-x-1 sm:space-x-2 py-2 sm:py-3 md:py-4 border-b-2 transition-colors text-xs sm:text-sm md:text-base whitespace-nowrap ${activeTab === 'blog' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-600 hover:text-gray-900'}`}
+              >
+                <Star className="h-4 w-4 sm:h-5 sm:w-5" />
+                <span className="hidden sm:inline">{t('admin.blogManagement') || 'إدارة المدونة'}</span>
+                <span className="sm:hidden">Blog</span>
+              </button>
+              <button
+                onClick={() => setActiveTab('auditLogs')}
+                className={`flex items-center space-x-1 sm:space-x-2 py-2 sm:py-3 md:py-4 border-b-2 transition-colors text-xs sm:text-sm md:text-base whitespace-nowrap ${activeTab === 'auditLogs' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-600 hover:text-gray-900'}`}
+              >
+                <ClipboardList className="h-4 w-4 sm:h-5 sm:w-5" />
+                <span className="hidden sm:inline">Audit Logs</span>
+                <span className="sm:hidden">Audit</span>
+              </button>
+              <button
+                onClick={() => setActiveTab('appointments')}
+                className={`flex items-center space-x-1 sm:space-x-2 py-2 sm:py-3 md:py-4 border-b-2 transition-colors text-xs sm:text-sm md:text-base whitespace-nowrap ${activeTab === 'appointments' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-600 hover:text-gray-900'}`}
+              >
+                <Calendar className="h-4 w-4 sm:h-5 sm:w-5" />
+                <span className="hidden sm:inline">{t('admin.appointments') || 'المواعيد'}</span>
+                <span className="sm:hidden">Appointments</span>
+              </button>
+              <button
+                onClick={() => setActiveTab('expertApplications')}
+                className={`flex items-center space-x-1 sm:space-x-2 py-2 sm:py-3 md:py-4 border-b-2 transition-colors text-xs sm:text-sm md:text-base whitespace-nowrap ${activeTab === 'expertApplications' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-600 hover:text-gray-900'}`}
+              >
+                <ClipboardList className="h-4 w-4 sm:h-5 sm:w-5" />
+                <span className="hidden lg:inline">Expert Applications</span>
+                <span className="lg:hidden">Expert</span>
+              </button>
+              <button
+                onClick={() => setActiveTab('quality')}
+                className={`flex items-center space-x-1 sm:space-x-2 py-2 sm:py-3 md:py-4 border-b-2 transition-colors text-xs sm:text-sm md:text-base whitespace-nowrap ${activeTab === 'quality' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-600 hover:text-gray-900'}`}
+              >
+                <BarChart3 className="h-4 w-4 sm:h-5 sm:w-5" />
+                <span className="hidden sm:inline">Quality Metrics</span>
+                <span className="sm:hidden">Quality</span>
+              </button>
+              <button
+                onClick={() => setActiveTab('messages')}
+                className={`flex items-center space-x-1 sm:space-x-2 py-2 sm:py-3 md:py-4 border-b-2 transition-colors text-xs sm:text-sm md:text-base whitespace-nowrap ${activeTab === 'messages' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-600 hover:text-gray-900'}`}
+              >
+                <MessageSquare className="h-4 w-4 sm:h-5 sm:w-5" />
+                <span className="hidden sm:inline">Messages</span>
+                <span className="sm:hidden">Chat</span>
+              </button>
+              <button
+                onClick={() => setActiveTab('notifications')}
+                className={`flex items-center space-x-1 sm:space-x-2 py-2 sm:py-3 md:py-4 border-b-2 transition-colors text-xs sm:text-sm md:text-base whitespace-nowrap ${activeTab === 'notifications' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-600 hover:text-gray-900'}`}
+              >
+                <Bell className="h-4 w-4 sm:h-5 sm:w-5" />
+                <span className="hidden sm:inline">Notifications</span>
+                <span className="sm:hidden">Alerts</span>
+              </button>
+              <button
+                onClick={() => setActiveTab('security')}
+                className={`flex items-center space-x-1 sm:space-x-2 py-2 sm:py-3 md:py-4 border-b-2 transition-colors text-xs sm:text-sm md:text-base whitespace-nowrap ${activeTab === 'security' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-600 hover:text-gray-900'}`}
+              >
+                <Shield className="h-4 w-4 sm:h-5 sm:w-5" />
+                <span className="hidden md:inline">Security & RBAC</span>
+                <span className="md:hidden">Security</span>
+              </button>
+            </div>
           </nav>
 
-          <div className="p-2 sm:p-6">
+          <div className="p-3 sm:p-4 md:p-6">
             {/* Overview Tab */}
             {activeTab === 'overview' && (
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 text-center">
@@ -367,7 +434,8 @@ const AdminDashboard: React.FC = () => {
                 {/* Pending Providers Approval */}
                 <div>
                   <h2 className="text-lg font-semibold mb-2">Pending Provider Approvals</h2>
-                  <table className="min-w-full divide-y divide-gray-200">
+                  <div className="overflow-x-auto">
+                    <table className="min-w-full divide-y divide-gray-200">
                     <thead>
                       <tr>
                         <th className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('admin.name') || 'الاسم'}</th>
@@ -392,11 +460,13 @@ const AdminDashboard: React.FC = () => {
                         </tr>
                       ))}
                     </tbody>
-                  </table>
+                    </table>
+                  </div>
                 </div>
                 <div>
                   <h2 className="text-lg font-semibold mb-2">{t('admin.doctorApplications') || 'طلبات الأطباء'}</h2>
-                  <table className="min-w-full divide-y divide-gray-200">
+                  <div className="overflow-x-auto">
+                    <table className="min-w-full divide-y divide-gray-200">
                     <thead>
                       <tr>
                         <th className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('admin.name') || 'الاسم'}</th>
@@ -420,7 +490,8 @@ const AdminDashboard: React.FC = () => {
                         </tr>
                       ))}
                     </tbody>
-                  </table>
+                    </table>
+                  </div>
                 </div>
                 <div>
                   <h2 className="text-lg font-semibold mb-2">{t('admin.userActivity') || 'نشاط المستخدمين'}</h2>
@@ -444,47 +515,224 @@ const AdminDashboard: React.FC = () => {
             {/* Rating Monitoring Tab */}
             {activeTab === 'ratings' && (
               <div className="space-y-6">
-                <table className="min-w-full divide-y divide-gray-200">
-                  <thead>
-                    <tr>
-                      <th className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('admin.name') || 'الاسم'}</th>
-                      <th className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('admin.email') || 'البريد الإلكتروني'}</th>
-                      <th className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('admin.avgRating') || 'متوسط التقييم'}</th>
-                      <th className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('admin.status') || 'الحالة'}</th>
-                      <th className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('admin.alert') || 'تنبيه'}</th>
-                    </tr>
-                  </thead>
-                  <tbody className="bg-white divide-y divide-gray-100">
-                    {mockDoctors.map(doc => (
-                      <tr key={doc.id}>
-                        <td className="px-2 py-2 whitespace-nowrap">{doc.name}</td>
-                        <td className="px-2 py-2 whitespace-nowrap">{doc.email}</td>
-                        <td className="px-2 py-2 whitespace-nowrap">{doc.avgRating}</td>
-                        <td className="px-2 py-2 whitespace-nowrap">
-                          {doc.avgRating < 7 ? (
-                            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-200 text-gray-800"><XCircle className="h-4 w-4 mr-1" />{t('admin.disabled') || 'معطل مؤقتاً'}</span>
-                          ) : (
-                            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800"><CheckCircle className="h-4 w-4 mr-1" />{t('admin.active') || 'نشط'}</span>
-                          )}
-                        </td>
-                        <td className="px-2 py-2 whitespace-nowrap">
-                          {doc.avgRating < 7 ? (
-                            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800"><AlertTriangle className="h-4 w-4 mr-1" />{t('admin.reviewAndContact') || 'راجع الطبيب وتواصل معه'}</span>
-                          ) : (
-                            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">-</span>
-                          )}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+                <div className="bg-white rounded-lg shadow">
+                  <div className="px-6 py-4 border-b border-gray-200">
+                    <h3 className="text-lg font-medium text-gray-900">Comprehensive Review Analytics</h3>
+                    <p className="text-sm text-gray-600">Detailed review data from patient feedback</p>
+                  </div>
+                  
+                  {/* Review Statistics */}
+                  <div className="p-6">
+                    {(() => {
+                      const reviewsWithData = appointments.filter(apt => apt.hasReview && apt.reviewData);
+                      const totalReviews = reviewsWithData.length;
+                      
+                      if (totalReviews === 0) {
+                        return (
+                          <div className="text-center py-8">
+                            <Star className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                            <p className="text-gray-600">No reviews submitted yet</p>
+                            <p className="text-sm text-gray-500 mt-1">Reviews will appear here once patients submit feedback</p>
+                          </div>
+                        );
+                      }
+                      
+                      // Calculate average ratings by category
+                      const avgCommunication = reviewsWithData.reduce((sum, apt) => sum + (apt.reviewData?.listenedCarefully || 0), 0) / totalReviews;
+                      const avgTimeliness = reviewsWithData.reduce((sum, apt) => sum + (apt.reviewData?.easyScheduling || 0), 0) / totalReviews;
+                      const avgProfessionalism = reviewsWithData.reduce((sum, apt) => sum + (apt.reviewData?.courtesy || 0), 0) / totalReviews;
+                      const avgOverall = reviewsWithData.reduce((sum, apt) => sum + (apt.reviewData?.overallSatisfaction || 0), 0) / totalReviews;
+                      const recommendationRate = reviewsWithData.filter(apt => apt.reviewData?.wouldRecommend).length / totalReviews * 100;
+                      
+                      return (
+                        <div className="space-y-6">
+                          {/* Overall Statistics */}
+                          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                            <div className="bg-blue-50 p-4 rounded-lg">
+                              <div className="flex items-center justify-between">
+                                <div>
+                                  <p className="text-sm font-medium text-blue-600">Total Reviews</p>
+                                  <p className="text-2xl font-bold text-blue-800">{totalReviews}</p>
+                                </div>
+                                <FileText className="h-8 w-8 text-blue-600" />
+                              </div>
+                            </div>
+                            
+                            <div className="bg-green-50 p-4 rounded-lg">
+                              <div className="flex items-center justify-between">
+                                <div>
+                                  <p className="text-sm font-medium text-green-600">Avg Overall Rating</p>
+                                  <p className="text-2xl font-bold text-green-800">{avgOverall.toFixed(1)}/5</p>
+                                </div>
+                                <Star className="h-8 w-8 text-green-600" />
+                              </div>
+                            </div>
+                            
+                            <div className="bg-purple-50 p-4 rounded-lg">
+                              <div className="flex items-center justify-between">
+                                <div>
+                                  <p className="text-sm font-medium text-purple-600">Recommendation Rate</p>
+                                  <p className="text-2xl font-bold text-purple-800">{recommendationRate.toFixed(0)}%</p>
+                                </div>
+                                <CheckCircle className="h-8 w-8 text-purple-600" />
+                              </div>
+                            </div>
+                            
+                            <div className="bg-orange-50 p-4 rounded-lg">
+                              <div className="flex items-center justify-between">
+                                <div>
+                                  <p className="text-sm font-medium text-orange-600">Avg Communication</p>
+                                  <p className="text-2xl font-bold text-orange-800">{avgCommunication.toFixed(1)}/5</p>
+                                </div>
+                                <MessageSquare className="h-8 w-8 text-orange-600" />
+                              </div>
+                            </div>
+                          </div>
+                          
+                          {/* Category Breakdown */}
+                          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div className="bg-gray-50 p-4 rounded-lg">
+                              <h4 className="font-medium text-gray-900 mb-2">Communication</h4>
+                              <div className="space-y-1">
+                                <div className="flex justify-between text-sm">
+                                  <span>Listening</span>
+                                  <span className="font-medium">{avgCommunication.toFixed(1)}</span>
+                                </div>
+                                <div className="flex justify-between text-sm">
+                                  <span>Explanations</span>
+                                  <span className="font-medium">{(reviewsWithData.reduce((sum, apt) => sum + (apt.reviewData?.explainedClearly || 0), 0) / totalReviews).toFixed(1)}</span>
+                                </div>
+                                <div className="flex justify-between text-sm">
+                                  <span>Respect</span>
+                                  <span className="font-medium">{(reviewsWithData.reduce((sum, apt) => sum + (apt.reviewData?.feltRespected || 0), 0) / totalReviews).toFixed(1)}</span>
+                                </div>
+                              </div>
+                            </div>
+                            
+                            <div className="bg-gray-50 p-4 rounded-lg">
+                              <h4 className="font-medium text-gray-900 mb-2">Timeliness</h4>
+                              <div className="space-y-1">
+                                <div className="flex justify-between text-sm">
+                                  <span>Scheduling</span>
+                                  <span className="font-medium">{avgTimeliness.toFixed(1)}</span>
+                                </div>
+                                <div className="flex justify-between text-sm">
+                                  <span>Wait Time</span>
+                                  <span className="font-medium">{(reviewsWithData.reduce((sum, apt) => sum + (apt.reviewData?.waitTime || 0), 0) / totalReviews).toFixed(1)}</span>
+                                </div>
+                                <div className="flex justify-between text-sm">
+                                  <span>Punctuality</span>
+                                  <span className="font-medium">{(reviewsWithData.reduce((sum, apt) => sum + (apt.reviewData?.startedOnTime || 0), 0) / totalReviews).toFixed(1)}</span>
+                                </div>
+                              </div>
+                            </div>
+                            
+                            <div className="bg-gray-50 p-4 rounded-lg">
+                              <h4 className="font-medium text-gray-900 mb-2">Professionalism</h4>
+                              <div className="space-y-1">
+                                <div className="flex justify-between text-sm">
+                                  <span>Courtesy</span>
+                                  <span className="font-medium">{avgProfessionalism.toFixed(1)}</span>
+                                </div>
+                                <div className="flex justify-between text-sm">
+                                  <span>Empathy</span>
+                                  <span className="font-medium">{(reviewsWithData.reduce((sum, apt) => sum + (apt.reviewData?.showedEmpathy || 0), 0) / totalReviews).toFixed(1)}</span>
+                                </div>
+                                <div className="flex justify-between text-sm">
+                                  <span>Cultural Respect</span>
+                                  <span className="font-medium">{(reviewsWithData.reduce((sum, apt) => sum + (apt.reviewData?.culturalRespect || 0), 0) / totalReviews).toFixed(1)}</span>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          
+                          {/* Individual Reviews */}
+                          <div>
+                            <h4 className="text-lg font-medium text-gray-900 mb-4">Individual Reviews</h4>
+                            <div className="space-y-4">
+                              {reviewsWithData.map((appointment) => {
+                                const provider = mockProviders.find(p => p.id === appointment.providerId);
+                                const reviewData = appointment.reviewData;
+                                
+                                return (
+                                  <div key={appointment.id} className="bg-white border border-gray-200 rounded-lg p-4">
+                                    <div className="flex items-start justify-between mb-3">
+                                      <div className="flex items-center space-x-3">
+                                        <img
+                                          src={provider?.photo}
+                                          alt={provider?.name}
+                                          className="w-10 h-10 rounded-lg object-cover"
+                                        />
+                                        <div>
+                                          <h5 className="font-medium text-gray-900">{provider?.name}</h5>
+                                          <p className="text-sm text-gray-600">{provider?.subcategory}</p>
+                                          <p className="text-xs text-gray-500">{appointment.date} at {appointment.time}</p>
+                                        </div>
+                                      </div>
+                                      <div className="flex items-center space-x-1">
+                                        {[...Array(5)].map((_, i) => (
+                                          <Star
+                                            key={i}
+                                            className={`w-4 h-4 ${
+                                              i < (reviewData.overallSatisfaction || 0)
+                                                ? 'text-yellow-400 fill-current'
+                                                : 'text-gray-300'
+                                            }`}
+                                          />
+                                        ))}
+                                        <span className="ml-1 text-sm font-medium text-gray-700">
+                                          {reviewData.overallSatisfaction}/5
+                                        </span>
+                                      </div>
+                                    </div>
+                                    
+                                    {/* Review Details */}
+                                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
+                                      <div className="flex justify-between">
+                                        <span className="text-gray-600">Communication:</span>
+                                        <span className="font-medium">{reviewData.listenedCarefully || 0}/5</span>
+                                      </div>
+                                      <div className="flex justify-between">
+                                        <span className="text-gray-600">Timeliness:</span>
+                                        <span className="font-medium">{reviewData.easyScheduling || 0}/5</span>
+                                      </div>
+                                      <div className="flex justify-between">
+                                        <span className="text-gray-600">Professionalism:</span>
+                                        <span className="font-medium">{reviewData.courtesy || 0}/5</span>
+                                      </div>
+                                      <div className="flex justify-between">
+                                        <span className="text-gray-600">Recommend:</span>
+                                        <span className={`font-medium ${reviewData.wouldRecommend ? 'text-green-600' : 'text-red-600'}`}>
+                                          {reviewData.wouldRecommend ? 'Yes' : 'No'}
+                                        </span>
+                                      </div>
+                                    </div>
+                                    
+                                    {/* Improvement Suggestions */}
+                                    {reviewData.improvementSuggestions && (
+                                      <div className="mt-3 p-3 bg-gray-50 rounded-lg">
+                                        <h6 className="text-sm font-medium text-gray-700 mb-1">Improvement Suggestions:</h6>
+                                        <p className="text-sm text-gray-600">{reviewData.improvementSuggestions}</p>
+                                      </div>
+                                    )}
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })()}
+                  </div>
+                </div>
               </div>
             )}
 
             {/* Evaluator Requests Tab */}
             {activeTab === 'evaluatorRequests' && (
               <div className="space-y-6">
-                <table className="min-w-full divide-y divide-gray-200">
+                <div className="overflow-x-auto">
+                  <table className="min-w-full divide-y divide-gray-200">
                   <thead>
                     <tr>
                       <th className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('admin.doctor') || 'الطبيب'}</th>
@@ -507,7 +755,8 @@ const AdminDashboard: React.FC = () => {
                       </tr>
                     ))}
                   </tbody>
-                </table>
+                  </table>
+                </div>
               </div>
             )}
 
@@ -621,6 +870,211 @@ const AdminDashboard: React.FC = () => {
 
             {/* Expert Applications Tab */}
             {activeTab === 'expertApplications' && <ExpertApplicationsTable />}
+
+            {/* Quality Metrics Tab */}
+            {activeTab === 'quality' && <QualityMetrics />}
+
+            {/* Messages Tab */}
+            {activeTab === 'messages' && <MessageSystem />}
+
+            {/* Notifications Tab */}
+            {activeTab === 'notifications' && (
+              <div className="space-y-6">
+                <div className="flex items-center justify-between">
+                  <h2 className="text-2xl font-bold text-gray-900">Notification Management</h2>
+                  <button className="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center gap-2">
+                    <Plus className="h-4 w-4" />
+                    Send Notification
+                  </button>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm font-medium text-gray-600">Total Notifications</p>
+                        <p className="text-2xl font-bold text-gray-900">1,234</p>
+                      </div>
+                      <Bell className="h-8 w-8 text-blue-600" />
+                    </div>
+                  </div>
+                  
+                  <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm font-medium text-gray-600">Unread</p>
+                        <p className="text-2xl font-bold text-gray-900">89</p>
+                      </div>
+                      <AlertTriangle className="h-8 w-8 text-yellow-600" />
+                    </div>
+                  </div>
+                  
+                  <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm font-medium text-gray-600">Delivery Rate</p>
+                        <p className="text-2xl font-bold text-gray-900">98.5%</p>
+                      </div>
+                      <CheckCircle className="h-8 w-8 text-green-600" />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+                  <div className="px-6 py-4 border-b border-gray-200">
+                    <h3 className="text-lg font-semibold text-gray-900">Recent Notifications</h3>
+                  </div>
+                  <div className="p-6">
+                    <div className="space-y-4">
+                      {[1, 2, 3, 4, 5].map((i) => (
+                        <div key={i} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                          <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                              <Bell className="h-5 w-5 text-blue-600" />
+                            </div>
+                            <div>
+                              <p className="font-medium text-gray-900">Appointment Confirmed</p>
+                              <p className="text-sm text-gray-600">Dr. Ahmed's appointment has been confirmed</p>
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <p className="text-sm text-gray-500">2 hours ago</p>
+                            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                              Delivered
+                            </span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Security & RBAC Tab */}
+            {activeTab === 'security' && (
+              <div className="space-y-6">
+                <div className="flex items-center justify-between">
+                  <h2 className="text-2xl font-bold text-gray-900">Security & Role-Based Access Control</h2>
+                  <button className="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center gap-2">
+                    <Settings className="h-4 w-4" />
+                    Security Settings
+                  </button>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                  <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm font-medium text-gray-600">Active Users</p>
+                        <p className="text-2xl font-bold text-gray-900">1,456</p>
+                      </div>
+                      <Users className="h-8 w-8 text-green-600" />
+                    </div>
+                  </div>
+                  
+                  <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm font-medium text-gray-600">Admin Users</p>
+                        <p className="text-2xl font-bold text-gray-900">12</p>
+                      </div>
+                      <Shield className="h-8 w-8 text-blue-600" />
+                    </div>
+                  </div>
+                  
+                  <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm font-medium text-gray-600">Failed Logins</p>
+                        <p className="text-2xl font-bold text-gray-900">23</p>
+                      </div>
+                      <AlertTriangle className="h-8 w-8 text-red-600" />
+                    </div>
+                  </div>
+                  
+                  <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm font-medium text-gray-600">Security Score</p>
+                        <p className="text-2xl font-bold text-gray-900">95%</p>
+                      </div>
+                      <CheckCircle className="h-8 w-8 text-green-600" />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+                    <div className="px-6 py-4 border-b border-gray-200">
+                      <h3 className="text-lg font-semibold text-gray-900">Role Permissions</h3>
+                    </div>
+                    <div className="p-6">
+                      <div className="space-y-4">
+                        {[
+                          { role: 'Admin', permissions: [t('admin.fullAccess'), t('admin.userManagement'), t('admin.systemSettings')] },
+                          { role: 'Provider', permissions: [t('admin.profileManagement'), t('admin.appointments'), t('dashboard.reviews')] },
+                          { role: 'User', permissions: [t('admin.bookAppointments'), t('admin.leaveReviews'), t('admin.profile')] },
+                          { role: 'Evaluator', permissions: [t('admin.qualityAssessment'), t('admin.providerEvaluation')] }
+                        ].map((roleInfo, index) => (
+                          <div key={index} className="border border-gray-200 rounded-lg p-4">
+                            <div className="flex items-center justify-between mb-2">
+                              <h4 className="font-medium text-gray-900">{roleInfo.role}</h4>
+                              <span className="text-sm text-gray-500">
+                                {roleInfo.permissions.length} permissions
+                              </span>
+                            </div>
+                            <div className="flex flex-wrap gap-2">
+                              {roleInfo.permissions.map((permission, pIndex) => (
+                                <span
+                                  key={pIndex}
+                                  className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
+                                >
+                                  {permission}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+                    <div className="px-6 py-4 border-b border-gray-200">
+                      <h3 className="text-lg font-semibold text-gray-900">Security Logs</h3>
+                    </div>
+                    <div className="p-6">
+                      <div className="space-y-3">
+                        {[
+                          { action: t('admin.loginAttempt'), user: 'admin@example.com', time: `2 ${t('admin.minutesAgo')}`, status: t('admin.success') },
+                          { action: t('admin.permissionChange'), user: 'provider@example.com', time: `1 ${t('admin.hourAgo')}`, status: t('admin.success') },
+                          { action: t('admin.failedLogin'), user: 'unknown@example.com', time: `3 ${t('admin.hoursAgo')}`, status: t('admin.failed') },
+                          { action: t('admin.roleUpdate'), user: 'user@example.com', time: `5 ${t('admin.hoursAgo')}`, status: t('admin.success') }
+                        ].map((log, index) => (
+                          <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                            <div>
+                              <p className="font-medium text-gray-900">{log.action}</p>
+                              <p className="text-sm text-gray-600">{log.user}</p>
+                            </div>
+                            <div className="text-right">
+                              <p className="text-sm text-gray-500">{log.time}</p>
+                              <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                                log.status === t('admin.success')
+                                  ? 'bg-green-100 text-green-800' 
+                                  : 'bg-red-100 text-red-800'
+                              }`}>
+                                {log.status}
+                              </span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>

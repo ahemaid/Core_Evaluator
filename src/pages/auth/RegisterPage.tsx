@@ -4,6 +4,7 @@ import { Eye, EyeOff, Star, Loader, ArrowRight } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useTranslation } from '../../utils/translations';
 import { serviceCategories } from '../../data/categories';
+import { env, validateFileType, validateFileSize, formatFileSize } from '../../utils/env';
 
 const RegisterPage: React.FC = () => {
   const navigate = useNavigate();
@@ -36,7 +37,7 @@ const RegisterPage: React.FC = () => {
     const formData = new FormData();
     formData.append('photo', file);
     formData.append('providerId', providerId);
-    const response = await fetch('http://localhost:4000/upload-provider-photo', {
+    const response = await fetch(env.UPLOAD_PROVIDER_PHOTO_URL, {
       method: 'POST',
       body: formData,
     });
@@ -98,16 +99,14 @@ const RegisterPage: React.FC = () => {
   const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
-      const validTypes = ['image/jpeg', 'image/png', 'image/webp', 'application/pdf'];
-      const maxSize = 5 * 1024 * 1024; // 5MB
-      if (!validTypes.includes(file.type)) {
-        setError('Only JPG, PNG, WEBP images, or PDF files are allowed.');
+      if (!validateFileType(file)) {
+        setError(`Only ${env.ALLOWED_FILE_TYPES.join(', ')} files are allowed.`);
         setPhotoFile(null);
         setPhotoPreview(null);
         return;
       }
-      if (file.size > maxSize) {
-        setError('File size must be less than 5MB.');
+      if (!validateFileSize(file)) {
+        setError(`File size must be less than ${formatFileSize(env.MAX_FILE_SIZE)}.`);
         setPhotoFile(null);
         setPhotoPreview(null);
         return;

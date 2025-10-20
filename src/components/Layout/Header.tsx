@@ -48,18 +48,28 @@ const Header: React.FC = () => {
 
           {/* Desktop Navigation */}
           <nav className={language === 'ar' ? 'hidden md:flex items-center gap-x-6' : 'hidden md:flex items-center space-x-8'}>
-            <Link to="/search" className={`text-gray-700 hover:text-blue-600 transition-colors${language === 'ar' ? ' ml-6' : ''}`}>
-              {t('nav.findProviders')}
-            </Link>
+            {/* Only show Find Providers for regular users, not providers or admins */}
+            {user && (user.role === 'provider' || user.role === 'admin') ? null : (
+              <Link to="/search" className={`text-gray-700 hover:text-blue-600 transition-colors${language === 'ar' ? ' ml-6' : ''}`}>
+                {t('nav.findProviders')}
+              </Link>
+            )}
             {user && (
               <>
-                <Link to="/dashboard" className="text-gray-700 hover:text-blue-600 transition-colors">
+                {/* Show Dashboard for all logged-in users, but link to appropriate dashboard based on role */}
+                <Link 
+                  to={user.role === 'provider' ? '/provider/dashboard' : user.role === 'admin' ? '/admin/dashboard' : '/dashboard'} 
+                  className="text-gray-700 hover:text-blue-600 transition-colors"
+                >
                   {t('nav.dashboard')}
                 </Link>
-                <div className="flex items-center space-x-2 text-sm text-gray-600">
-                  <Award className="h-4 w-4 text-yellow-500" />
-                  <span>{user.rewardPoints} {t('common.points')}</span>
-                </div>
+                {/* Only show points for regular users, not providers or admins */}
+                {user.role !== 'provider' && user.role !== 'admin' && (
+                  <div className="flex items-center space-x-2 text-sm text-gray-600">
+                    <Award className="h-4 w-4 text-yellow-500" />
+                    <span>{user.rewardPoints} {t('common.points')}</span>
+                  </div>
+                )}
               </>
             )}
           </nav>
@@ -141,26 +151,33 @@ const Header: React.FC = () => {
         {isMenuOpen && (
           <div className="md:hidden py-4 border-t border-gray-100">
             <div className="flex flex-col space-y-3">
-              <Link
-                to="/search"
-                className="text-gray-700 hover:text-blue-600 transition-colors py-2"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                {t('nav.findProviders')}
-              </Link>
+              {/* Only show Find Providers for regular users, not providers or admins */}
+              {user && (user.role === 'provider' || user.role === 'admin') ? null : (
+                <Link
+                  to="/search"
+                  className="text-gray-700 hover:text-blue-600 transition-colors py-2"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  {t('nav.findProviders')}
+                </Link>
+              )}
               {user ? (
                 <>
+                  {/* Show Dashboard for all logged-in users, but link to appropriate dashboard based on role */}
                   <Link
-                    to="/dashboard"
+                    to={user.role === 'provider' ? '/provider/dashboard' : user.role === 'admin' ? '/admin/dashboard' : '/dashboard'}
                     className="text-gray-700 hover:text-blue-600 transition-colors py-2"
                     onClick={() => setIsMenuOpen(false)}
                   >
                     {t('nav.dashboard')}
                   </Link>
-                  <div className="flex items-center space-x-2 py-2">
-                    <Award className="h-4 w-4 text-yellow-500" />
-                    <span className="text-sm text-gray-600">{user.rewardPoints} {t('common.points')}</span>
-                  </div>
+                  {/* Only show points for regular users, not providers or admins */}
+                  {user.role !== 'provider' && user.role !== 'admin' && (
+                    <div className="flex items-center space-x-2 py-2">
+                      <Award className="h-4 w-4 text-yellow-500" />
+                      <span className="text-sm text-gray-600">{user.rewardPoints} {t('common.points')}</span>
+                    </div>
+                  )}
                   <div className="flex items-center space-x-2 py-2">
                     <User className="h-4 w-4 text-gray-600" />
                     <span className="text-sm text-gray-700">{user.name}</span>

@@ -307,9 +307,9 @@ export const translations: {
     ar: 'المدينة'
   },
   'common.selectCity': {
-    en: 'Select City',
-    de: 'Stadt auswählen',
-    ar: 'اختر المدينة'
+    en: 'City',
+    de: 'Stadt',
+    ar: 'المدينة'
   },
   'common.providersFound': {
     en: 'Providers Found',
@@ -326,10 +326,161 @@ export const translations: {
     de: 'Öffnungszeiten:',
     ar: 'ساعات العمل:'
   },
-  'common.selectDay': {
-    en: 'Select Day',
-    de: 'Tag auswählen',
-    ar: 'اختر اليوم'
+  // Review System
+  'review.title': {
+    en: 'Rate Your Experience',
+    de: 'Bewerten Sie Ihre Erfahrung',
+    ar: 'قيم تجربتك'
+  },
+  'review.submit': {
+    en: 'Submit Review',
+    de: 'Bewertung absenden',
+    ar: 'إرسال التقييم'
+  },
+  'review.communication.title': {
+    en: '1. Doctor-Patient Communication',
+    de: '1. Arzt-Patient Kommunikation',
+    ar: '1. التواصل بين الطبيب والمريض'
+  },
+  'review.communication.listened': {
+    en: 'Did your doctor listen carefully to your concerns?',
+    de: 'Hat Ihr Arzt sorgfältig auf Ihre Bedenken gehört?',
+    ar: 'هل استمع طبيبك بعناية لاهتماماتك؟'
+  },
+  'review.communication.explained': {
+    en: 'Did your doctor explain diagnosis and treatment clearly?',
+    de: 'Hat Ihr Arzt Diagnose und Behandlung klar erklärt?',
+    ar: 'هل شرح طبيبك التشخيص والعلاج بوضوح؟'
+  },
+  'review.communication.respected': {
+    en: 'Did you feel respected and understood?',
+    de: 'Haben Sie sich respektiert und verstanden gefühlt?',
+    ar: 'هل شعرت بالاحترام والفهم؟'
+  },
+  'review.communication.addressed': {
+    en: 'Were your questions fully addressed?',
+    de: 'Wurden Ihre Fragen vollständig beantwortet?',
+    ar: 'هل تم الرد على أسئلتك بالكامل؟'
+  },
+  'review.timeliness.title': {
+    en: '2. Timeliness and Access to Care',
+    de: '2. Pünktlichkeit und Zugang zur Versorgung',
+    ar: '2. التوقيت والوصول للرعاية'
+  },
+  'review.timeliness.scheduling': {
+    en: 'How easy was it to schedule your appointment?',
+    de: 'Wie einfach war es, Ihren Termin zu vereinbaren?',
+    ar: 'كم كان سهلاً تحديد موعدك؟'
+  },
+  'review.timeliness.waitTime': {
+    en: 'How long did you wait before seeing the doctor?',
+    de: 'Wie lange mussten Sie warten, bevor Sie den Arzt sahen?',
+    ar: 'كم من الوقت انتظرت قبل رؤية الطبيب؟'
+  },
+  'review.timeliness.timeSpent': {
+    en: 'Were you satisfied with the time spent with you?',
+    de: 'Waren Sie mit der Zeit zufrieden, die mit Ihnen verbracht wurde?',
+    ar: 'هل كنت راضياً عن الوقت الذي قضاه معك؟'
+  },
+  'review.timeliness.onTime': {
+    en: 'Was your appointment started on time?',
+    de: 'Wurde Ihr Termin pünktlich begonnen?',
+    ar: 'هل بدأ موعدك في الوقت المحدد؟'
+  },
+  'review.professionalism.title': {
+    en: '3. Professionalism and Empathy',
+    de: '3. Professionalität und Empathie',
+    ar: '3. الاحترافية والتعاطف'
+  },
+  'review.professionalism.courtesy': {
+    en: 'How would you rate your doctor\'s courtesy and professionalism?',
+    de: 'Wie würden Sie die Höflichkeit und Professionalität Ihres Arztes bewerten?',
+    ar: 'كيف تقيم أدب ومهنية طبيبك؟'
+  },
+  'review.professionalism.comfortable': {
+    en: 'Did you feel comfortable discussing personal health issues?',
+    de: 'Haben Sie sich wohl gefühlt, persönliche Gesundheitsprobleme zu besprechen?',
+    ar: 'هل شعرت بالراحة في مناقشة مشاكل صحتك الشخصية؟'
+  },
+  'review.professionalism.empathy': {
+    en: 'Did your doctor show empathy and genuine concern?',
+    de: 'Hat Ihr Arzt Empathie und echte Sorge gezeigt?',
+    ar: 'هل أظهر طبيبك التعاطف والاهتمام الحقيقي؟'
+  },
+  'review.professionalism.cultural': {
+    en: 'Were your cultural or religious values respected?',
+    de: 'Wurden Ihre kulturellen oder religiösen Werte respektiert?',
+    ar: 'هل تم احترام قيمك الثقافية أو الدينية؟'
+  },
+  'review.quality.title': {
+    en: '4. Quality of Medical Care',
+    de: '4. Qualität der medizinischen Versorgung',
+    ar: '4. جودة الرعاية الطبية'
+  },
+  'review.quality.diagnosis': {
+    en: 'How satisfied are you with the accuracy of diagnosis and treatment?',
+    de: 'Wie zufrieden sind Sie mit der Genauigkeit der Diagnose und Behandlung?',
+    ar: 'كم أنت راضٍ عن دقة التشخيص والعلاج؟'
+  },
+  'review.quality.instructions': {
+    en: 'Did you receive clear instructions for medication and follow-up?',
+    de: 'Haben Sie klare Anweisungen für Medikamente und Nachsorge erhalten?',
+    ar: 'هل تلقيت تعليمات واضحة للأدوية والمتابعة؟'
+  },
+  'review.quality.improved': {
+    en: 'Do you feel your health improved as a result of treatment?',
+    de: 'Haben Sie das Gefühl, dass sich Ihre Gesundheit durch die Behandlung verbessert hat?',
+    ar: 'هل تشعر أن صحتك تحسنت نتيجة للعلاج؟'
+  },
+  'review.quality.tests': {
+    en: 'Were any tests or procedures explained before being performed?',
+    de: 'Wurden Tests oder Verfahren vor der Durchführung erklärt?',
+    ar: 'هل تم شرح أي فحوصات أو إجراءات قبل تنفيذها؟'
+  },
+  'review.facility.title': {
+    en: '5. Facility and Service Experience',
+    de: '5. Einrichtung und Service-Erfahrung',
+    ar: '5. تجربة المنشأة والخدمة'
+  },
+  'review.facility.cleanliness': {
+    en: 'How would you rate the cleanliness and comfort of the clinic?',
+    de: 'Wie würden Sie die Sauberkeit und den Komfort der Klinik bewerten?',
+    ar: 'كيف تقيم نظافة وراحة العيادة؟'
+  },
+  'review.facility.staff': {
+    en: 'Were staff members professional and helpful?',
+    de: 'Waren die Mitarbeiter professionell und hilfsbereit?',
+    ar: 'هل كان الموظفون مهنيين ومفيدين؟'
+  },
+  'review.facility.coordination': {
+    en: 'How satisfied were you with the coordination between doctor and staff?',
+    de: 'Wie zufrieden waren Sie mit der Koordination zwischen Arzt und Personal?',
+    ar: 'كم كنت راضياً عن التنسيق بين الطبيب والموظفين؟'
+  },
+  'review.overall.title': {
+    en: '6. Overall Satisfaction and Recommendations',
+    de: '6. Gesamtzufriedenheit und Empfehlungen',
+    ar: '6. الرضا العام والتوصيات'
+  },
+  'review.overall.satisfaction': {
+    en: 'Overall, how satisfied are you with your doctor\'s care?',
+    de: 'Insgesamt, wie zufrieden sind Sie mit der Betreuung Ihres Arztes?',
+    ar: 'بشكل عام، كم أنت راضٍ عن رعاية طبيبك؟'
+  },
+  'review.overall.recommend': {
+    en: 'Would you recommend this doctor or facility to others?',
+    de: 'Würden Sie diesen Arzt oder diese Einrichtung anderen empfehlen?',
+    ar: 'هل تنصح بهذا الطبيب أو المنشأة للآخرين؟'
+  },
+  'review.overall.improvements': {
+    en: 'What could the doctor or clinic do to improve your experience?',
+    de: 'Was könnte der Arzt oder die Klinik tun, um Ihre Erfahrung zu verbessern?',
+    ar: 'ماذا يمكن للطبيب أو العيادة فعله لتحسين تجربتك؟'
+  },
+  'review.overall.improvementsPlaceholder': {
+    en: 'Share your suggestions for improvement...',
+    de: 'Teilen Sie Ihre Verbesserungsvorschläge mit...',
+    ar: 'شارك اقتراحاتك للتحسين...'
   },
   'common.selectTime': {
     en: 'Select Time',
@@ -561,6 +712,11 @@ export const translations: {
     en: 'Upload Receipt',
     de: 'Beleg hochladen',
     ar: 'تحميل الإيصال'
+  },
+  'dashboard.viewReceipt': {
+    en: 'View Receipt',
+    de: 'Beleg anzeigen',
+    ar: 'عرض الإيصال'
   },
   'dashboard.completedStatus': {
     en: 'Completed',
@@ -928,6 +1084,11 @@ export const translations: {
     de: 'Status',
     ar: 'الحالة'
   },
+  'dashboard.actions': {
+    en: 'Actions',
+    de: 'Aktionen',
+    ar: 'إجراءات'
+  },
   'dashboard.pending': {
     en: 'Pending',
     de: 'Ausstehend',
@@ -937,6 +1098,11 @@ export const translations: {
     en: 'Confirmed',
     de: 'Bestätigt',
     ar: 'تم التأكيد'
+  },
+  'dashboard.cancelled': {
+    en: 'Cancelled',
+    de: 'Storniert',
+    ar: 'ملغي'
   },
   'dashboard.noRequestedAppointments': {
     en: 'No requested appointments.',
@@ -1184,6 +1350,201 @@ export const translations: {
     en: 'Delete',
     de: 'Löschen',
     ar: 'حذف'
+  },
+  'admin.appointments': {
+    en: 'Appointments',
+    de: 'Termine',
+    ar: 'المواعيد'
+  },
+  'admin.customer': {
+    en: 'Customer',
+    de: 'Kunde',
+    ar: 'العميل'
+  },
+  'admin.provider': {
+    en: 'Provider',
+    de: 'Anbieter',
+    ar: 'مقدم الخدمة'
+  },
+  'admin.time': {
+    en: 'Time',
+    de: 'Uhrzeit',
+    ar: 'الوقت'
+  },
+  'admin.category': {
+    en: 'Category',
+    de: 'Kategorie',
+    ar: 'الفئة'
+  },
+  'admin.yes': {
+    en: 'Yes',
+    de: 'Ja',
+    ar: 'نعم'
+  },
+  'admin.no': {
+    en: 'No',
+    de: 'Nein',
+    ar: 'لا'
+  },
+  'admin.fullAccess': {
+    en: 'Full Access',
+    de: 'Vollzugriff',
+    ar: 'وصول كامل'
+  },
+  'admin.userManagement': {
+    en: 'User Management',
+    de: 'Benutzerverwaltung',
+    ar: 'إدارة المستخدمين'
+  },
+  'admin.systemSettings': {
+    en: 'System Settings',
+    de: 'Systemeinstellungen',
+    ar: 'إعدادات النظام'
+  },
+  'admin.profileManagement': {
+    en: 'Profile Management',
+    de: 'Profilverwaltung',
+    ar: 'إدارة الملف الشخصي'
+  },
+  'admin.bookAppointments': {
+    en: 'Book Appointments',
+    de: 'Termine buchen',
+    ar: 'حجز المواعيد'
+  },
+  'admin.leaveReviews': {
+    en: 'Leave Reviews',
+    de: 'Bewertungen abgeben',
+    ar: 'ترك المراجعات'
+  },
+  'admin.profile': {
+    en: 'Profile',
+    de: 'Profil',
+    ar: 'الملف الشخصي'
+  },
+  'admin.qualityAssessment': {
+    en: 'Quality Assessment',
+    de: 'Qualitätsbewertung',
+    ar: 'تقييم الجودة'
+  },
+  'admin.providerEvaluation': {
+    en: 'Provider Evaluation',
+    de: 'Anbieterbewertung',
+    ar: 'تقييم مقدم الخدمة'
+  },
+  'admin.loginAttempt': {
+    en: 'Login Attempt',
+    de: 'Anmeldeversuch',
+    ar: 'محاولة تسجيل الدخول'
+  },
+  'admin.permissionChange': {
+    en: 'Permission Change',
+    de: 'Berechtigungsänderung',
+    ar: 'تغيير الصلاحيات'
+  },
+  'admin.failedLogin': {
+    en: 'Failed Login',
+    de: 'Fehlgeschlagene Anmeldung',
+    ar: 'تسجيل دخول فاشل'
+  },
+  'admin.roleUpdate': {
+    en: 'Role Update',
+    de: 'Rollenaktualisierung',
+    ar: 'تحديث الدور'
+  },
+  'admin.success': {
+    en: 'Success',
+    de: 'Erfolgreich',
+    ar: 'نجح'
+  },
+  'admin.failed': {
+    en: 'Failed',
+    de: 'Fehlgeschlagen',
+    ar: 'فشل'
+  },
+  'admin.minutesAgo': {
+    en: 'minutes ago',
+    de: 'Minuten zuvor',
+    ar: 'دقائق مضت'
+  },
+  'admin.hourAgo': {
+    en: 'hour ago',
+    de: 'Stunde zuvor',
+    ar: 'ساعة مضت'
+  },
+  'admin.hoursAgo': {
+    en: 'hours ago',
+    de: 'Stunden zuvor',
+    ar: 'ساعات مضت'
+  },
+  'dashboard.dashboard': {
+    en: 'Dashboard',
+    de: 'Dashboard',
+    ar: 'لوحة التحكم'
+  },
+  'dashboard.profile': {
+    en: 'Profile',
+    de: 'Profil',
+    ar: 'الملف الشخصي'
+  },
+  'dashboard.analytics': {
+    en: 'Analytics',
+    de: 'Analytik',
+    ar: 'التحليلات'
+  },
+  'dashboard.appointmentsShort': {
+    en: 'Appts',
+    de: 'Termine',
+    ar: 'المواعيد'
+  },
+  'dashboard.ratingReport': {
+    en: 'Rating Report',
+    de: 'Bewertungsbericht',
+    ar: 'تقرير التقييم'
+  },
+  'dashboard.reports': {
+    en: 'Reports',
+    de: 'Berichte',
+    ar: 'التقارير'
+  },
+  'dashboard.expertEvaluator': {
+    en: 'Expert Evaluator',
+    de: 'Expertenbewertung',
+    ar: 'تقييم الخبراء'
+  },
+  'dashboard.evaluator': {
+    en: 'Evaluator',
+    de: 'Bewerter',
+    ar: 'المقيم'
+  },
+  'dashboard.expert': {
+    en: 'Expert',
+    de: 'Experte',
+    ar: 'خبير'
+  },
+  'dashboard.updateProfile': {
+    en: 'Update Profile',
+    de: 'Profil aktualisieren',
+    ar: 'تحديث الملف الشخصي'
+  },
+  'dashboard.viewAnalytics': {
+    en: 'View Analytics',
+    de: 'Analytik anzeigen',
+    ar: 'عرض التحليلات'
+  },
+  'dashboard.quickActions': {
+    en: 'Quick Actions',
+    de: 'Schnellaktionen',
+    ar: 'الإجراءات السريعة'
+  },
+  'dashboard.totalAppointments': {
+    en: 'Total Appointments',
+    de: 'Gesamte Termine',
+    ar: 'إجمالي المواعيد'
+  },
+  'dashboard.rating': {
+    en: 'Rating',
+    de: 'Bewertung',
+    ar: 'التقييم'
   },
   'country.Jordan': {
     en: 'Jordan',
@@ -1586,6 +1947,16 @@ export const translations: {
     ar: 'يرجى كتابة بعض السطور حول سبب رغبتك في الانضمام.',
     de: 'Bitte schreiben Sie ein paar Zeilen zu Ihrer Motivation.'
   },
+  'features.expertEvaluations': {
+    en: 'Expert Evaluations',
+    de: 'Expertenbewertungen',
+    ar: 'تقييمات الخبراء'
+  },
+  'features.expertEvaluationsDesc': {
+    en: 'Get professional evaluations from certified experts to improve your service quality and reputation.',
+    de: 'Erhalten Sie professionelle Bewertungen von zertifizierten Experten, um Ihre Servicequalität und Ihren Ruf zu verbessern.',
+    ar: 'احصل على تقييمات مهنية من خبراء معتمدين لتحسين جودة خدمتك وسمعتك.'
+  }
 };
 
 export type Language = 'en' | 'de' | 'ar';

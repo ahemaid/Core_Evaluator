@@ -38,7 +38,34 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const login = async (email: string, password: string, role?: string): Promise<boolean> => {
     setIsLoading(true);
     try {
-      // Simulate API call
+      // Try real API login first
+      try {
+        const response = await fetch('http://localhost:3001/api/auth/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ email, password }),
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          if (data.success && data.token) {
+            // Store both user data and auth token
+            setUser(data.user);
+            localStorage.setItem('user', JSON.stringify(data.user));
+            localStorage.setItem('authToken', data.token);
+            console.log('Real API login successful, token stored');
+            return true;
+          }
+        } else {
+          console.log('API login failed with status:', response.status);
+        }
+      } catch (apiError) {
+        console.log('API login failed, falling back to mock auth:', apiError);
+      }
+
+      // Fallback to mock authentication for development
       await new Promise(resolve => setTimeout(resolve, 1000));
 
       // Add evaluator login support
@@ -55,11 +82,49 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         };
         setUser(evaluatorUser);
         localStorage.setItem('user', JSON.stringify(evaluatorUser));
+        // Set a mock token for development
+        localStorage.setItem('authToken', 'mock-token-for-development');
         return true;
       }
 
+      // For mock auth, try to get a real token from the API
+      try {
+        const tokenResponse = await fetch('http://localhost:3001/api/auth/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ email: 'test@example.com', password: 'password123' }),
+        });
+
+        if (tokenResponse.ok) {
+          const tokenData = await tokenResponse.json();
+          if (tokenData.success && tokenData.token) {
+            const mockUser: User = {
+              id: tokenData.user.id, // Use the real user ID from API
+              email,
+              name: email.split('@')[0],
+              phone: '+1234567890',
+              role: (role as any) || 'user',
+              rewardPoints: 150,
+              createdAt: new Date().toISOString(),
+              language: 'ar',
+            };
+
+            setUser(mockUser);
+            localStorage.setItem('user', JSON.stringify(mockUser));
+            localStorage.setItem('authToken', tokenData.token); // Use real token
+            console.log('Mock auth with real token successful');
+            return true;
+          }
+        }
+      } catch (tokenError) {
+        console.log('Failed to get real token for mock auth:', tokenError);
+      }
+
+      // Final fallback with mock token
       const mockUser: User = {
-        id: '1',
+        id: '68f56f4e3c8cc89bff73e820',
         email,
         name: email.split('@')[0],
         phone: '+1234567890',
@@ -71,6 +136,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       setUser(mockUser);
       localStorage.setItem('user', JSON.stringify(mockUser));
+      localStorage.setItem('authToken', 'mock-token-for-development');
+      console.log('Using mock token as final fallback');
       return true;
     } catch (error) {
       return false;
@@ -150,6 +217,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const logout = () => {
     setUser(null);
     localStorage.removeItem('user');
+    localStorage.removeItem('authToken');
   };
 
   const updateLanguage = (language: 'en' | 'de' | 'ar') => {

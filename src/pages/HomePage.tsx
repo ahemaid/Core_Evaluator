@@ -3,8 +3,8 @@ import { Search, MapPin, Star, Users, Award, Shield, ArrowRight, Heart, Utensils
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useTranslation } from '../utils/translations';
-import { serviceCategories } from '../data/categories';
-import { blogs } from '../data/blogs';
+import { serviceCategories } from '../data/mockData';
+import { blogs } from '../data/mockData';
 
 const HomePage: React.FC = () => {
   const navigate = useNavigate();
@@ -40,6 +40,20 @@ const HomePage: React.FC = () => {
     Algeria: ['الجزائر العاصمة', 'وهران', 'قسنطينة'],
     Egypt: ['القاهرة'],
     Germany: ['برلين']
+  };
+
+  const getCityKey = (cityName: string): string => {
+    const cityMap: { [key: string]: string } = {
+      'عمان': 'Amman',
+      'إربد': 'Irbid',
+      'الزرقاء': 'Zarqa',
+      'الجزائر العاصمة': 'Algiers',
+      'وهران': 'Oran',
+      'قسنطينة': 'Constantine',
+      'القاهرة': 'Cairo',
+      'برلين': 'Berlin'
+    };
+    return cityMap[cityName] || cityName;
   };
 
   const getCategoryIcon = (iconName: string) => {
@@ -157,15 +171,15 @@ const HomePage: React.FC = () => {
 
                 {/* City Selection */}
                 <div className="space-y-2">
-                  <label className="text-xs sm:text-sm font-medium text-gray-700">اختر المدينة</label>
+                  <label className="text-xs sm:text-sm font-medium text-gray-700">{t('common.selectCity')}</label>
                   <select
                     value={selectedCity}
                     onChange={(e) => setSelectedCity(e.target.value)}
                     className="w-full p-2 sm:p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
                   >
-                    <option value="">اختر المدينة</option>
+                    <option value="">{t('common.selectCity')}</option>
                     {(citiesByCountry[selectedCountry] || []).map(city => (
-                      <option key={city} value={city}>{city}</option>
+                      <option key={city} value={city}>{t(`city.${getCityKey(city)}`) || city}</option>
                     ))}
                   </select>
                 </div>

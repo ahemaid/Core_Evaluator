@@ -36,6 +36,85 @@ const ServiceProviderCard: React.FC<ServiceProviderCardProps> = ({ provider, onB
 
   // Helper: get available days from provider
   const availableDays = provider.availability || [];
+  console.log('Available days for provider:', provider.name, availableDays);
+
+  // Helper: generate available calendar dates for the next 2 weeks
+  function getAvailableDates() {
+    const dates = [];
+    const today = new Date();
+    
+    // Generate dates for the next 14 days
+    for (let i = 1; i <= 14; i++) {
+      const date = new Date(today);
+      date.setDate(today.getDate() + i);
+      
+      // Get day name (e.g., "Monday", "Tuesday")
+      const dayName = date.toLocaleDateString('en-US', { weekday: 'long' });
+      
+      // Check if provider is available on this day
+      const isAvailable = availableDays.some(day => day.day === dayName);
+      
+      if (isAvailable) {
+        dates.push({
+          date: date,
+          dayName: dayName,
+          formattedDate: date.toLocaleDateString('en-US', { 
+            year: 'numeric', 
+            month: 'long', 
+            day: 'numeric' 
+          })
+        });
+      }
+    }
+    
+    return dates;
+  }
+
+  // Helper: generate calendar grid for current month
+  function getCalendarGrid() {
+    const today = new Date();
+    const currentMonth = today.getMonth();
+    const currentYear = today.getFullYear();
+    
+    // Get first day of current month and number of days
+    const firstDay = new Date(currentYear, currentMonth, 1);
+    const lastDay = new Date(currentYear, currentMonth + 1, 0);
+    const daysInMonth = lastDay.getDate();
+    const startDayOfWeek = firstDay.getDay(); // 0 = Sunday, 1 = Monday, etc.
+    
+    const calendar = [];
+    
+    // Add empty cells for days before the first day of the month
+    for (let i = 0; i < startDayOfWeek; i++) {
+      calendar.push({ date: null, isCurrentMonth: false });
+    }
+    
+    // Add days of the current month
+    for (let day = 1; day <= daysInMonth; day++) {
+      const date = new Date(currentYear, currentMonth, day);
+      const dayName = date.toLocaleDateString('en-US', { weekday: 'long' });
+      const isAvailable = availableDays.some(d => d.day === dayName);
+      const isToday = day === today.getDate();
+      const isPast = date < today;
+      
+      calendar.push({
+        date: date,
+        day: day,
+        dayName: dayName,
+        isCurrentMonth: true,
+        isAvailable: isAvailable && !isPast,
+        isToday: isToday,
+        isPast: isPast,
+        formattedDate: date.toLocaleDateString('en-US', { 
+          year: 'numeric', 
+          month: 'long', 
+          day: 'numeric' 
+        })
+      });
+    }
+    
+    return calendar;
+  }
 
   // Helper: generate time slots for a given day
   function getTimeSlots(day: string) {
@@ -73,12 +152,16 @@ const ServiceProviderCard: React.FC<ServiceProviderCardProps> = ({ provider, onB
 
   const handleConfirm = () => {
     if (selectedDay && selectedSlot && user) {
+      // Find the selected date info
+      const selectedDateInfo = getAvailableDates().find(d => d.dayName === selectedDay);
+      const appointmentDate = selectedDateInfo ? selectedDateInfo.formattedDate : selectedDay;
+      
       // Create new appointment
       const newAppointment = {
         id: Date.now().toString(),
         userId: user.id,
         providerId: provider.id,
-        date: selectedDay,
+        date: appointmentDate,
         time: selectedSlot,
         status: 'confirmed',
         notes: '',
@@ -287,20 +370,85 @@ const ServiceProviderCard: React.FC<ServiceProviderCardProps> = ({ provider, onB
           <DialogContent>
             <div className="flex flex-col gap-4 mt-2" style={{ direction: isRTL ? 'rtl' : 'ltr' }}>
               {/* Day selection */}
-              <label className="font-medium mb-1">{t('common.selectDay')}</label>
-              <select
-                value={selectedDay}
-                onChange={e => {
-                  setSelectedDay(e.target.value);
-                  setSelectedSlot('');
-                }}
-                className="p-2 border rounded-lg"
-              >
-                <option value="">{t('common.selectDay')}</option>
-                {availableDays.map(day => (
-                  <option key={day.day} value={day.day}>{t('common.' + day.day.toLowerCase())}</option>
-                ))}
-              </select>
+              {/* Calendar Date Selection */}
+              <label className="font-medium mb-1">{t('common.selectDate') || 'Select Date'}</label>
+              <div className="border rounded-lg p-4 bg-white">
+                {/* Calendar Header */}
+                <div className="text-center font-semibold text-gray-800 mb-3">
+                  {new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+                </div>
+                
+                {/* Day Headers */}
+                <div className="grid grid-cols-7 gap-1 text-center text-sm font-medium text-gray-600 mb-2">
+                  <div className="p-2">S</div>
+                  <div className="p-2">M</div>
+                  <div className="p-2">T</div>
+                  <div className="p-2">W</div>
+                  <div className="p-2">T</div>
+                  <div className="p-2">F</div>
+                  <div className="p-2">S</div>
+                </div>
+                
+                {/* Calendar Grid */}
+                <div className="grid grid-cols-7 gap-1">
+                  {getCalendarGrid().map((dayInfo, index) => {
+                    if (!dayInfo.isCurrentMonth) {
+                      return <div key={index} className="p-2"></div>;
+                    }
+                    
+                    const isSelected = selectedDay === dayInfo.dayName;
+                    const canSelect = dayInfo.isAvailable;
+                    
+                    return (
+                      <button
+                        key={index}
+                        onClick={() => {
+                          if (canSelect) {
+                            setSelectedDay(dayInfo.dayName);
+                            setSelectedSlot('');
+                          }
+                        }}
+                        disabled={!canSelect}
+                        className={`p-2 text-sm rounded transition-colors ${
+                          !canSelect
+                            ? 'text-gray-300 cursor-not-allowed'
+                            : isSelected
+                            ? 'bg-blue-500 text-white hover:bg-blue-600'
+                            : dayInfo.isToday
+                            ? 'bg-blue-100 text-blue-700 hover:bg-blue-200'
+                            : 'bg-white text-gray-700 hover:bg-gray-100'
+                        }`}
+                        title={dayInfo.formattedDate}
+                      >
+                        {dayInfo.day}
+                      </button>
+                    );
+                  })}
+                </div>
+                
+                {/* Selected Date Display */}
+                {selectedDay && (
+                  <div className="mt-3 text-sm text-gray-600 text-center p-2 bg-blue-50 rounded">
+                    Selected: {getAvailableDates().find(d => d.dayName === selectedDay)?.formattedDate}
+                  </div>
+                )}
+                
+                {/* Legend */}
+                <div className="mt-3 flex justify-center gap-4 text-xs text-gray-500">
+                  <div className="flex items-center gap-1">
+                    <div className="w-3 h-3 bg-blue-500 rounded"></div>
+                    <span>Selected</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <div className="w-3 h-3 bg-blue-100 rounded"></div>
+                    <span>Today</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <div className="w-3 h-3 bg-gray-300 rounded"></div>
+                    <span>Unavailable</span>
+                  </div>
+                </div>
+              </div>
               {/* Time slot selection */}
               {selectedDay && (
                 <>

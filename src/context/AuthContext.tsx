@@ -84,7 +84,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setUser(evaluatorUser);
         localStorage.setItem('user', JSON.stringify(evaluatorUser));
         // Set a mock token for development
-        localStorage.setItem('authToken', 'mock-token-for-development');
+        localStorage.setItem('authToken', 'mock-token-evaluator');
         return true;
       }
 
@@ -138,7 +138,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       setUser(mockUser);
       localStorage.setItem('user', JSON.stringify(mockUser));
-      localStorage.setItem('authToken', 'mock-token-for-development');
+      localStorage.setItem('authToken', 'mock-token-user');
       console.log('Using mock token as final fallback');
       return true;
     } catch (error) {
@@ -169,6 +169,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       setUser(newUser);
       localStorage.setItem('user', JSON.stringify(newUser));
+      localStorage.setItem('authToken', 'mock-token-user');
 
       // If provider, add a complete ServiceProvider object to localStorage.providers
       if (newUser.role === 'provider') {

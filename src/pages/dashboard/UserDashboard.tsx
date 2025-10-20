@@ -24,8 +24,9 @@ const UserDashboard: React.FC = () => {
       console.log('Loaded appointments from localStorage:', parsed);
       return parsed;
     }
-    console.log('Using mock appointments:', mockAppointments);
-    return mockAppointments;
+    // For new users, start with empty appointments
+    console.log('New user - starting with empty appointments');
+    return [];
   });
 
   useEffect(() => {
@@ -315,7 +316,11 @@ const UserDashboard: React.FC = () => {
                       })}
                     </div>
                   ) : (
-                    <p className="text-gray-600">{t('dashboard.noUpcomingAppointments')}</p>
+                    <div className="text-center py-8">
+                      <Calendar className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                      <p className="text-gray-600">{t('dashboard.noUpcomingAppointments')}</p>
+                      <p className="text-sm text-gray-500 mt-1">{t('dashboard.bookFirstAppointment') || 'Book your first appointment to get started!'}</p>
+                    </div>
                   )}
                 </div>
 
@@ -385,7 +390,11 @@ const UserDashboard: React.FC = () => {
                       })}
                     </div>
                   ) : (
-                    <p className="text-gray-600">{t('dashboard.noCompletedAppointments')}</p>
+                    <div className="text-center py-8">
+                      <Clock className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                      <p className="text-gray-600">{t('dashboard.noCompletedAppointments')}</p>
+                      <p className="text-sm text-gray-500 mt-1">{t('dashboard.completeAppointmentsToSee') || 'Complete appointments to see them here!'}</p>
+                    </div>
                   )}
                 </div>
               </div>

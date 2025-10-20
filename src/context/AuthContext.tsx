@@ -126,12 +126,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       // Final fallback with mock token
       const mockUser: User = {
-        id: '68f56f4e3c8cc89bff73e820',
+        id: `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
         email,
         name: email.split('@')[0],
         phone: '+1234567890',
         role: (role as any) || 'user',
-        rewardPoints: 150,
+        rewardPoints: 0,
         createdAt: new Date().toISOString(),
         language: 'ar',
       };
@@ -155,7 +155,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       await new Promise(resolve => setTimeout(resolve, 1000));
       
       const newUser: User = {
-        id: Date.now().toString(),
+        id: `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
         email: userData.email!,
         name: userData.name!,
         phone: userData.phone!,

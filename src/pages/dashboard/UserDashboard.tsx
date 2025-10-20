@@ -193,7 +193,7 @@ const UserDashboard: React.FC = () => {
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-8">
           <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 md:gap-0">
             <div>
-              <h1 className={`text-xl sm:text-2xl font-bold text-gray-900${language === 'ar' ? ' mr-4' : ''}`}>{t('dashboard.welcome')}{user?.name ? `, ${user.name}` : ''}</h1>
+              <h1 className={`text-xl sm:text-2xl font-bold text-gray-900${language === 'ar' ? ' mr-4' : ''}`}>{t('dashboard.welcome')}</h1>
               <p className="text-gray-600 mt-1 text-sm sm:text-base">{t('dashboard.manageAppointments')}</p>
             </div>
             <div className={language === 'ar' ? 'flex items-center gap-x-4 md:gap-x-6 mr-4' : 'flex items-center space-x-2 md:space-x-4'}>

@@ -482,6 +482,11 @@ export const translations: {
     de: 'Teilen Sie Ihre Verbesserungsvorschläge mit...',
     ar: 'شارك اقتراحاتك للتحسين...'
   },
+  'common.selectDate': {
+    en: 'Select Date',
+    de: 'Datum auswählen',
+    ar: 'اختر التاريخ'
+  },
   'common.selectTime': {
     en: 'Select Time',
     de: 'Uhrzeit auswählen',

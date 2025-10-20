@@ -278,42 +278,44 @@ const DoctorCard: React.FC<DoctorCardProps> = ({ doctor, onBook, showFullDetails
                       <div className="p-2">S</div>
                     </div>
                     
-                    {/* Calendar Grid */}
-                    <div className="grid grid-cols-7 gap-1">
-                      {getCalendarGrid().map((dayInfo, index) => {
-                        if (!dayInfo.isCurrentMonth) {
-                          return <div key={index} className="p-2"></div>;
-                        }
-                        
-                        const isSelected = selectedDay === dayInfo.dayName;
-                        const canSelect = dayInfo.isAvailable;
-                        
-                        return (
-                          <button
-                            key={index}
-                            onClick={() => {
-                              if (canSelect) {
-                                setSelectedDay(dayInfo.dayName);
-                                setSelectedSlot('');
-                              }
-                            }}
-                            disabled={!canSelect}
-                            className={`p-2 text-sm rounded transition-colors ${
-                              !canSelect
-                                ? 'text-gray-300 cursor-not-allowed'
-                                : isSelected
-                                ? 'bg-blue-500 text-white hover:bg-blue-600'
-                                : dayInfo.isToday
-                                ? 'bg-blue-100 text-blue-700 hover:bg-blue-200'
-                                : 'bg-white text-gray-700 hover:bg-gray-100'
-                            }`}
-                            title={dayInfo.formattedDate}
-                          >
-                            {dayInfo.day}
-                          </button>
-                        );
-                      })}
-                    </div>
+                {/* Calendar Grid */}
+                <div className="grid grid-cols-7 gap-1">
+                  {getCalendarGrid().map((dayInfo, index) => {
+                    if (!dayInfo.isCurrentMonth) {
+                      return <div key={`empty-${index}`} className="p-2"></div>;
+                    }
+                    
+                    const isSelected = selectedDay === dayInfo.dayName;
+                    const canSelect = dayInfo.isAvailable;
+                    
+                    return (
+                      <button
+                        key={`day-${dayInfo.day}-${index}`}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          if (canSelect) {
+                            setSelectedDay(dayInfo.dayName);
+                            setSelectedSlot('');
+                          }
+                        }}
+                        disabled={!canSelect}
+                        className={`p-2 text-sm rounded transition-colors ${
+                          !canSelect
+                            ? 'text-gray-300 cursor-not-allowed'
+                            : isSelected
+                            ? 'bg-blue-500 text-white hover:bg-blue-600'
+                            : dayInfo.isToday
+                            ? 'bg-blue-100 text-blue-700 hover:bg-blue-200'
+                            : 'bg-white text-gray-700 hover:bg-gray-100'
+                        }`}
+                        title={dayInfo.formattedDate}
+                      >
+                        {dayInfo.day}
+                      </button>
+                    );
+                  })}
+                </div>
                     
                     {/* Selected Date Display */}
                     {selectedDay && (

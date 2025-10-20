@@ -393,7 +393,7 @@ const ServiceProviderCard: React.FC<ServiceProviderCardProps> = ({ provider, onB
                 <div className="grid grid-cols-7 gap-1">
                   {getCalendarGrid().map((dayInfo, index) => {
                     if (!dayInfo.isCurrentMonth) {
-                      return <div key={index} className="p-2"></div>;
+                      return <div key={`empty-${index}`} className="p-2"></div>;
                     }
                     
                     const isSelected = selectedDay === dayInfo.dayName;
@@ -401,8 +401,10 @@ const ServiceProviderCard: React.FC<ServiceProviderCardProps> = ({ provider, onB
                     
                     return (
                       <button
-                        key={index}
-                        onClick={() => {
+                        key={`day-${dayInfo.day}-${index}`}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
                           if (canSelect) {
                             setSelectedDay(dayInfo.dayName);
                             setSelectedSlot('');
